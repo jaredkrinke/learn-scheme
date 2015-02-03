@@ -1,0 +1,62 @@
+<content title="(learn scheme)">
+
+<front>
+<section title="How to Use This Site">
+<subsection title="What is (learn scheme)?">
+<lead><term>(learn scheme)</term> is a tiny, interactive implementation of the <term>Scheme</term> programming language that runs in your browser.</lead>
+<p><term>Scheme</term> is a minimalist variant of Lisp that can be studied in order to understand Lisp in general. Lisp is frequently touted as a "powerful" programming language because of its unique design in which code is just data that can manipulated or transformed in order to create new programs at run-time.</p>
+</subsection>
+
+<subsection title="How do I use (learn scheme)?">
+<p><term>(learn scheme)</term> is an interactive environment for learning Scheme. At any time, you can click the <term>Launch Editor</term> button in the navigation bar at the top of the screen to launch the editor. Note that, on small screens, you may need to expand the navigation bar in order to find the <term>Launch Editor</term> button.</p>
+<p>Once you're in the editor, you can type Scheme code into the <term>Input</term> text box. When you want to execute your code, simply click the <term>Evaluate</term> button or press <term>Ctrl+Enter</term>. The output of the evaluation will be displayed in the <term>Output</term> text box.</p>
+</subsection>
+
+<subsection title="Demo">
+<p>Below, you'll find a sample of Scheme code in a text box, followed by the expected output of evaluating the code.</p>
+<p>If you'd like to try the code out, click the <term>Try it</term> button on the right side of the example code text box or double-click the text box itself to launch the editor with the example code. Once the editor is shown, you can follow the instructions above to evaluate the code and view the output.</p>
+<p>As an example, the following code</p>
+<code>
+(+ 1 2)
+</code>
+<p>evaluates to:</p>
+<result>3</result>
+</subsection>
+</section>
+
+<section title="Foreword">
+<p>More content</p>
+</section>
+</front>
+
+<body>
+<section title="Procedures">
+<p>TODO: Add a quote too</p>
+<section title="Elements">
+<p>Content!</p>
+<section title="Expressions">
+<p>Content!</p>
+</section>
+<section title="Naming">
+<p>Content!</p>
+</section>
+</section>
+<section title="Processes">
+<p>Content!</p>
+<section title="Sub1">
+<p>Content!</p>
+</section>
+<section title="Sub2">
+<p>Content!</p>
+</section>
+</section>
+</section>
+
+<section title="Data">
+<section title="Intro">
+<p>Content!</p>
+</section>
+</section>
+</body>
+
+</content>
