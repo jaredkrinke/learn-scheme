@@ -213,6 +213,9 @@
     <xsl:template match="result">
         <blockquote><xsl:copy-of select="text()"/></blockquote>
     </xsl:template>
+    <xsl:template match="brand">
+        <strong><xsl:value-of select="$brand"/></strong>
+    </xsl:template>
 
     <xsl:template match="/content//section"/>
 
