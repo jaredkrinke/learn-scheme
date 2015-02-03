@@ -1,0 +1,26 @@
+.CodeMirror {
+    background: #e0e0e0;
+    border: 1px solid black;
+}
+
+#editorOutput {
+    resize: none;
+}
+
+ul.toc li {
+    list-style-type: none;
+    font-size: 110%;
+}
+
+ul.toc > li {
+    font-size: 130%;
+}
+
+ul.toc {
+    padding-left: 0px;
+}
+
+ul.toc ul {
+    padding-left: 2em;
+}
+
