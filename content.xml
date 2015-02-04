@@ -64,4 +64,12 @@
 </section>
 </body>
 
+<back>
+<section title="License">
+<p>Learn Scheme is an adaptation of <term>Structure and Interpretation of Computer Programs</term> by Harold Abelson and Gerald Jay Sussman with Julie Sussman, second edition, published by the MIT Press. (c) 1996 by Massachusetts Institute of Technology.</p>
+<p>The content has been reformatted for the Web and made interactive by Jared Krinke. The Scheme interpreter is (c) 2015 Jared Krinke.</p>
+<p><a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.</p>
+</section>
+</back>
+
 </content>

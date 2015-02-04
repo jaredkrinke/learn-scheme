@@ -182,7 +182,7 @@
             <xsl:with-param name="file" select="$toc-file"/>
             <xsl:with-param name="body">
                 <ul class="toc">
-                    <xsl:for-each select="$annotated/content/front/section|$annotated/content/body/section">
+                    <xsl:for-each select="$annotated//section">
                         <xsl:call-template name="table-of-contents-item"/>
                     </xsl:for-each>
                 </ul>
