@@ -216,6 +216,9 @@
     <xsl:template match="code">
         <pre><xsl:copy-of select="text()"/></pre>
     </xsl:template>
+    <xsl:template match="p//code">
+        <code><xsl:copy-of select="text()"/></code>
+    </xsl:template>
     <xsl:template match="result">
         <blockquote><xsl:copy-of select="text()"/></blockquote>
     </xsl:template>
