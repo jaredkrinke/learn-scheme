@@ -119,6 +119,11 @@
         </xsl:if>
     </xsl:template>
 
+    <xsl:template match="exercise">
+        <u>Exercise <xsl:value-of select="@number"/></u>
+        <xsl:apply-templates select="./node()"/>
+    </xsl:template>
+
     <!-- Annotate body sections with numbers -->
     <xsl:template match="node()|@*" mode="annotate">
         <xsl:copy>
@@ -130,6 +135,19 @@
         <xsl:variable name="number" select="count(preceding::footnote) + 1"/>
         <xsl:copy>
             <xsl:attribute name="number"><xsl:value-of select="$number"/></xsl:attribute>
+            <xsl:apply-templates select="node()|@*" mode="annotate"/>
+        </xsl:copy>
+    </xsl:template>
+
+    <xsl:template match="exercise" mode="annotate">
+        <xsl:variable name="section" select="ancestor::section[last()]"/>
+        <xsl:variable name="sectionNumber" select="count($section/preceding-sibling::section) + 1"/>
+        <!-- Count just the exercises in this section -->
+        <xsl:variable name="sectionExercises" select="$section//exercise"/>
+        <xsl:variable name="precedingExercises" select="preceding::exercise"/>
+        <xsl:variable name="exerciseNumber" select="count($sectionExercises[count($precedingExercises) = count(. | $precedingExercises)]) + 1"/>
+        <xsl:copy>
+            <xsl:attribute name="number"><xsl:value-of select="concat($sectionNumber, '.', $exerciseNumber)"/></xsl:attribute>
             <xsl:apply-templates select="node()|@*" mode="annotate"/>
         </xsl:copy>
     </xsl:template>
