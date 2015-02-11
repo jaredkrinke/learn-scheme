@@ -105,9 +105,31 @@
         </xsl:result-document>
     </xsl:template>
 
+    <xsl:template match="footnote" mode="footnotes">
+        <p><small>
+            <sup><a name="{concat('footnote_', @number)}"></a><xsl:value-of select="@number"/> </sup>
+            <xsl:apply-templates select="./node()"/>
+        </small></p>
+    </xsl:template>
+
+    <xsl:template name="footnotes">
+        <xsl:if test="count(.//footnote) > 0">
+            <hr />
+            <xsl:apply-templates select=".//footnote" mode="footnotes"/>
+        </xsl:if>
+    </xsl:template>
+
     <!-- Annotate body sections with numbers -->
     <xsl:template match="node()|@*" mode="annotate">
         <xsl:copy>
+            <xsl:apply-templates select="node()|@*" mode="annotate"/>
+        </xsl:copy>
+    </xsl:template>
+
+    <xsl:template match="footnote" mode="annotate">
+        <xsl:variable name="number" select="count(preceding::footnote) + 1"/>
+        <xsl:copy>
+            <xsl:attribute name="number"><xsl:value-of select="$number"/></xsl:attribute>
             <xsl:apply-templates select="node()|@*" mode="annotate"/>
         </xsl:copy>
     </xsl:template>
@@ -225,6 +247,9 @@
     <xsl:template match="brand">
         <strong><xsl:value-of select="$brand"/></strong>
     </xsl:template>
+    <xsl:template match="footnote">
+        <sup><a href="{concat('#footnote_', @number)}"><xsl:value-of select="@number"/></a></sup>
+    </xsl:template>
 
     <xsl:template match="/content//section"/>
 
@@ -234,6 +259,7 @@
             <xsl:with-param name="file" select="doc:section-file(.)"/>
             <xsl:with-param name="body">
                 <xsl:apply-templates select="./node()"/>
+                <xsl:call-template name="footnotes"/>
             </xsl:with-param>
         </xsl:call-template>
     </xsl:template>
