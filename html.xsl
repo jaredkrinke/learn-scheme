@@ -124,6 +124,19 @@
         <xsl:apply-templates select="./node()"/>
     </xsl:template>
 
+    <xsl:template match="figure">
+        <div class=".pull-left"><p>
+            <img src="{@image}" /><br />
+            <small><u>Figure <xsl:value-of select="@number"/></u>:
+                <xsl:apply-templates select="node()"/>
+            </small>
+        </p></div>
+    </xsl:template>
+
+    <xsl:template match="image">
+        <div class=".pull-left"><img src="{@path}" /></div>
+    </xsl:template>
+
     <!-- Annotate body sections with numbers -->
     <xsl:template match="node()|@*" mode="annotate">
         <xsl:copy>
@@ -148,6 +161,18 @@
         <xsl:variable name="exerciseNumber" select="count($sectionExercises[count($precedingExercises) = count(. | $precedingExercises)]) + 1"/>
         <xsl:copy>
             <xsl:attribute name="number"><xsl:value-of select="concat($sectionNumber, '.', $exerciseNumber)"/></xsl:attribute>
+            <xsl:apply-templates select="node()|@*" mode="annotate"/>
+        </xsl:copy>
+    </xsl:template>
+
+    <xsl:template match="figure" mode="annotate">
+        <xsl:variable name="section" select="ancestor::section[last()]"/>
+        <xsl:variable name="sectionNumber" select="count($section/preceding-sibling::section) + 1"/>
+        <xsl:variable name="sectionFigures" select="$section//figure"/>
+        <xsl:variable name="precedingFigures" select="preceding::figure"/>
+        <xsl:variable name="figureNumber" select="count($sectionFigures[count($precedingFigures) = count(. | $precedingFigures)]) + 1"/>
+        <xsl:copy>
+            <xsl:attribute name="number"><xsl:value-of select="concat($sectionNumber, '.', $figureNumber)"/></xsl:attribute>
             <xsl:apply-templates select="node()|@*" mode="annotate"/>
         </xsl:copy>
     </xsl:template>
@@ -256,7 +281,7 @@
     <xsl:template match="code">
         <pre><xsl:copy-of select="text()"/></pre>
     </xsl:template>
-    <xsl:template match="p//code">
+    <xsl:template match="p//code | figure//code">
         <code><xsl:copy-of select="text()"/></code>
     </xsl:template>
     <xsl:template match="result">
