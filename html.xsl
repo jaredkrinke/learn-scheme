@@ -281,8 +281,8 @@
     <xsl:template match="code">
         <pre><xsl:copy-of select="text()"/></pre>
     </xsl:template>
-    <xsl:template match="p//code | figure//code">
-        <code><xsl:copy-of select="text()"/></code>
+    <xsl:template match="p//code | figure//code | ul//code">
+        <code><xsl:apply-templates select="node()"/></code>
     </xsl:template>
     <xsl:template match="result">
         <blockquote><xsl:copy-of select="text()"/></blockquote>
