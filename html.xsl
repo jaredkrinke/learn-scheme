@@ -115,7 +115,7 @@
     <xsl:template name="footnotes">
         <xsl:if test="count(./*[name() != 'section']//footnote) > 0">
             <hr />
-            <xsl:apply-templates select=".//footnote" mode="footnotes"/>
+            <xsl:apply-templates select="./*[name() != 'section']//footnote" mode="footnotes"/>
         </xsl:if>
     </xsl:template>
 
