@@ -128,7 +128,7 @@
         <div class=".pull-left"><p>
             <img src="{@image}" /><br />
             <small><u>Figure <xsl:value-of select="@number"/></u>:
-                <xsl:apply-templates select="node()"/>
+                <xsl:apply-templates select="caption/node()"/>
             </small>
         </p></div>
     </xsl:template>
@@ -262,6 +262,24 @@
         </xsl:copy>
     </xsl:template>
 
+    <!-- Convert line breaks to "br" elements -->
+    <xsl:template match="text()" mode="break-lines" name="break-lines">
+        <xsl:param name="text" select="."/>
+        
+        <xsl:choose>
+          <xsl:when test="not(contains($text, '&#xA;'))">
+            <xsl:copy-of select="$text"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="substring-before($text, '&#xA;')"/>
+            <br />
+            <xsl:call-template name="break-lines">
+              <xsl:with-param name="text" select="substring-after($text, '&#xA;')"/>
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
     <xsl:template match="subsection">
         <h2><xsl:value-of select="@title"/></h2>
         <xsl:apply-templates select="node()"/>
@@ -285,7 +303,7 @@
         <code><xsl:apply-templates select="node()"/></code>
     </xsl:template>
     <xsl:template match="result">
-        <blockquote><xsl:copy-of select="text()"/></blockquote>
+        <blockquote><xsl:apply-templates select="text()" mode="break-lines"/></blockquote>
     </xsl:template>
     <xsl:template match="brand">
         <strong><xsl:value-of select="$brand"/></strong>
