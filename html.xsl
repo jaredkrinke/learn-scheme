@@ -126,7 +126,12 @@
 
     <xsl:template match="figure">
         <div class=".pull-left"><p>
-            <img src="{@image}" /><br />
+            <xsl:if test="count(@image) > 0">
+                <img src="{@image}" /><br />
+            </xsl:if>
+            <xsl:if test="count(content) > 0">
+                <xsl:apply-templates select="content/node()"/>
+            </xsl:if>
             <small><u>Figure <xsl:value-of select="@number"/></u>:
                 <xsl:apply-templates select="caption/node()"/>
             </small>
@@ -299,7 +304,7 @@
     <xsl:template match="code">
         <pre><xsl:copy-of select="text()"/></pre>
     </xsl:template>
-    <xsl:template match="p//code | figure//code | ul//code">
+    <xsl:template match="p//code | figure/caption/code | ul//code">
         <code><xsl:apply-templates select="node()"/></code>
     </xsl:template>
     <xsl:template match="result">
