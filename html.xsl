@@ -307,7 +307,7 @@
     <xsl:template match="code">
         <pre><xsl:copy-of select="text()"/></pre>
     </xsl:template>
-    <xsl:template match="p//code | figure/caption/code | ul//code">
+    <xsl:template match="p//code[count(parent::footnote) = 0] | figure/caption/code | ul//code">
         <code><xsl:apply-templates select="node()"/></code>
     </xsl:template>
     <xsl:template match="result">
