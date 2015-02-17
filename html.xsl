@@ -106,10 +106,13 @@
     </xsl:template>
 
     <xsl:template match="footnote" mode="footnotes">
-        <p><small>
-            <sup><a name="{concat('footnote_', @number)}"></a><xsl:value-of select="@number"/> </sup>
-            <xsl:apply-templates select="./node()"/>
-        </small></p>
+        <small>
+            <p>
+                <sup><a name="{concat('footnote_', @number)}"></a><xsl:value-of select="@number"/> </sup>
+                <xsl:apply-templates select="./node()[1]/node()"/>
+            </p>
+            <xsl:apply-templates select="./node()[position() != 1]"/>
+        </small>
     </xsl:template>
 
     <xsl:template name="footnotes">
