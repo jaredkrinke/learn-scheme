@@ -31,31 +31,74 @@
 </front>
 
 <body>
-<section title="Procedures">
-<p>TODO: Add a quote too</p>
-<section title="Elements">
-<p>Content!</p>
-<section title="Expressions">
-<p>Content!</p>
-</section>
-<section title="Naming">
-<p>Content!</p>
-</section>
-</section>
-<section title="Processes">
-<p>Content!</p>
-<section title="Sub1">
-<p>Content!</p>
-</section>
-<section title="Sub2">
-<p>Content!</p>
-</section>
-</section>
-</section>
+<section title="Building Abstractions with Procedures">
+<quote source="John Locke, An Essay Concerning Human Understanding (1690)">  The acts of the mind, wherein it exerts its power over simple ideas, are chiefly these three: 1. Combining several simple ideas into one compound one, and thus all complex ideas are made.  2. The second is bringing two ideas, whether simple or complex, together, and setting them by one another so as to take a view of them at once, without uniting them into one, by which it gets all its ideas of relations. 3.  The third is separating them from all other ideas that accompany them in their real existence: this is called abstraction, and thus all its general ideas are made.</quote>
+<p>We are about to study the idea of a <term>computational process</term>. Computational processes are abstract beings that inhabit computers. As they evolve, processes manipulate other abstract things called <term>data</term>.  The evolution of a process is directed by a pattern of rules called a <term>program</term>.  People create programs to direct processes. In effect, we conjure the spirits of the computer with our spells.</p>
+<p>A computational process is indeed much like a sorcerer's idea of a spirit.  It cannot be seen or touched.  It is not composed of matter at all.  However, it is very real.  It can perform intellectual work. It can answer questions.  It can affect the world by disbursing money at a bank or by controlling a robot arm in a factory.  The programs we use to conjure processes are like a sorcerer's spells.  They are carefully composed from symbolic expressions in arcane and esoteric <term>programming languages</term> that prescribe the tasks we want our processes to perform.</p>
+<p>A computational process, in a correctly working computer, executes programs precisely and accurately.  Thus, like the sorcerer's apprentice, novice programmers must learn to understand and to anticipate the consequences of their conjuring.  Even small errors (usually called <term>bugs</term> or <term>glitches</term>) in programs can have complex and unanticipated consequences.</p>
+<p>Fortunately, learning to program is considerably less dangerous than learning sorcery, because the spirits we deal with are conveniently contained in a secure way.  Real-world programming, however, requires care, expertise, and wisdom.  A small bug in a computer-aided design program, for example, can lead to the catastrophic collapse of an airplane or a dam or the self-destruction of an industrial robot.</p>
+<p>Master software engineers have the ability to organize programs so that they can be reasonably sure that the resulting processes will perform the tasks intended.  They can visualize the behavior of their systems in advance.  They know how to structure programs so that unanticipated problems do not lead to catastrophic consequences, and when problems do arise, they can <term>debug</term> their programs.  Well-designed computational systems, like well-designed automobiles or nuclear reactors, are designed in a modular manner, so that the parts can be constructed, replaced, and debugged separately.</p>
+<subsection title="Programming in Lisp"><p>We need an appropriate language for describing processes, and we will use for this purpose the programming language Lisp.  Just as our everyday thoughts are usually expressed in our natural language (such as English, French, or Japanese), and descriptions of quantitative phenomena are expressed with mathematical notations, our procedural thoughts will be expressed in Lisp.  Lisp was invented in the late 1950s as a formalism for reasoning about the use of certain kinds of logical expressions, called <term>recursion equations</term>, as a model for computation.  The language was conceived by John McCarthy and is based on his paper "Recursive Functions of Symbolic Expressions and Their Computation by Machine" (McCarthy 1960).</p>
+<p>Despite its inception as a mathematical formalism, Lisp is a practical programming language.  A Lisp <term>interpreter</term> is a machine that carries out processes described in the Lisp language.  The first Lisp interpreter was implemented by McCarthy with the help of colleagues and students in the Artificial Intelligence Group of the MIT Research Laboratory of Electronics and in the MIT Computation Center.<footnote><p>The <term>Lisp 1 Programmer's Manual</term> appeared in 1960, and the <term>Lisp 1.5 Programmer's Manual</term> (McCarthy 1965) was published in 1962.  The early history of Lisp is described in McCarthy 1978.   </p>
+</footnote> Lisp, whose name is an acronym for LISt Processing, was designed to provide symbol-manipulating capabilities for attacking programming problems such as the symbolic differentiation and integration of algebraic expressions.  It included for this purpose new data objects known as atoms and lists, which most strikingly set it apart from all other languages of the period.</p>
+<p>Lisp was not the product of a concerted design effort.  Instead, it evolved informally in an experimental manner in response to users' needs and to pragmatic implementation considerations.  Lisp's informal evolution has continued through the years, and the community of Lisp users has traditionally resisted attempts to promulgate any "official" definition of the language.  This evolution, together with the flexibility and elegance of the initial conception, has enabled Lisp, which is the second oldest language in widespread use today (only Fortran is older), to continually adapt to encompass the most modern ideas about program design.  Thus, Lisp is by now a family of dialects, which, while sharing most of the original features, may differ from one another in significant ways.  The dialect of Lisp used in this book is called Scheme.<footnote><p>The two dialects in which most major Lisp programs of the 1970s were written are MacLisp (Moon 1978; Pitman 1983), developed at the MIT Project MAC, and Interlisp (Teitelman 1974), developed at Bolt Beranek and Newman Inc. and the Xerox Palo Alto Research Center.  Portable Standard Lisp (Hearn 1969; Griss 1981) was a Lisp dialect designed to be easily portable between different machines.  MacLisp spawned a number of subdialects, such as Franz Lisp, which was developed at the University of California at Berkeley, and Zetalisp (Moon 1981), which was based on a special-purpose processor designed at the MIT Artificial Intelligence Laboratory to run Lisp very efficiently.  The Lisp dialect used in this book, called Scheme (Steele 1975), was invented in 1975 by Guy Lewis Steele Jr. and Gerald Jay Sussman of the MIT Artificial Intelligence Laboratory and later reimplemented for instructional use at MIT.  Scheme became an IEEE standard in 1990 (IEEE 1990).  The Common Lisp dialect (Steele 1982, Steele 1990) was developed by the Lisp community to combine features from the earlier Lisp dialects to make an industrial standard for Lisp.  Common Lisp became an ANSI standard in 1994 (ANSI 1994).   </p>
+</footnote></p>
+<p>Because of its experimental character and its emphasis on symbol manipulation, Lisp was at first very inefficient for numerical computations, at least in comparison with Fortran.  Over the years, however, Lisp compilers have been developed that translate programs into machine code that can perform numerical computations reasonably efficiently.  And for special applications, Lisp has been used with great effectiveness.<footnote><p>One such special application was a breakthrough computation of scientific importance -- an integration of the motion of the Solar System that extended previous results by nearly two orders of magnitude, and demonstrated that the dynamics of the Solar System is chaotic.  This computation was made possible by new integration algorithms, a special-purpose compiler, and a special-purpose computer all implemented with the aid of software tools written in Lisp (Abelson et al. 1992; Sussman and Wisdom 1992).   </p>
+</footnote>  Although Lisp has not yet overcome its old reputation as hopelessly inefficient, Lisp is now used in many applications where efficiency is not the central concern.  For example, Lisp has become a language of choice for operating-system shell languages and for extension languages for editors and computer-aided design systems.</p>
+<p>If Lisp is not a mainstream language, why are we using it as the framework for our discussion of programming?  Because the language possesses unique features that make it an excellent medium for studying important programming constructs and data structures and for relating them to the linguistic features that support them.  The most significant of these features is the fact that Lisp descriptions of processes, called <term>procedures</term>, can themselves be represented and manipulated as Lisp data.  The importance of this is that there are powerful program-design techniques that rely on the ability to blur the traditional distinction between "passive" data and "active" processes.  As we shall discover, Lisp's flexibility in handling procedures as data makes it one of the most convenient languages in existence for exploring these techniques.  The ability to represent procedures as data also makes Lisp an excellent language for writing programs that must manipulate other programs as data, such as the interpreters and compilers that support computer languages.  Above and beyond these considerations, programming in Lisp is great fun.</p>
+</subsection>
 
-<section title="Data">
-<section title="Intro">
-<p>Content!</p>
+<section title="The Elements of Programming">
+<p>A powerful programming language is more than just a means for instructing a computer to perform tasks.  The language also serves as a framework within which we organize our ideas about processes.  Thus, when we describe a language, we should pay particular attention to the means that the language provides for combining simple ideas to form more complex ideas.  Every powerful language has three mechanisms for accomplishing this:</p>
+<ul>
+<li><term>primitive expressions</term>, which represent the simplest entities the language is concerned with,  </li>
+<li><term>means of combination</term>, by which compound elements are built from simpler ones, and  </li>
+<li><term>means of abstraction</term>, by which compound elements can be named and manipulated as units.  </li>
+</ul>
+<p>In programming, we deal with two kinds of elements: procedures and data. (Later we will discover that they are really not so distinct.) Informally, data is "stuff" that we want to manipulate, and procedures are descriptions of the rules for manipulating the data. Thus, any powerful programming language should be able to describe primitive data and primitive procedures and should have methods for combining and abstracting procedures and data.</p>
+<p>In this chapter we will deal only with simple numerical data so that we can focus on the rules for building procedures.<footnote><p>The characterization of numbers as "simple data" is a barefaced bluff. In fact, the treatment of numbers is one of the trickiest and most confusing aspects of any programming language.  Some typical issues involved are these: Some computer systems distinguish <term>integers</term>, such as 2, from <term>real numbers</term>, such as 2.71.  Is the real number 2.00 different from the integer 2? Are the arithmetic operations used for integers the same as the operations used for real numbers?  Does 6 divided by 2 produce 3, or 3.0?  How large a number can we represent? How many decimal places of accuracy can we represent?  Is the range of integers the same as the range of real numbers?  Above and beyond these questions, of course, lies a collection of issues concerning roundoff and truncation errors -- the entire science of numerical analysis.  Since our focus in this book is on large-scale program design rather than on numerical techniques, we are going to ignore these problems.  The numerical examples in this chapter will exhibit the usual roundoff behavior that one observes when using arithmetic operations that preserve a limited number of decimal places of accuracy in noninteger operations.   </p>
+</footnote> In later chapters we will see that these same rules allow us to build procedures to manipulate compound data as well.</p>
+<section title="Expressions">
+<p>One easy way to get started at programming is to examine some typical interactions with an interpreter for the Scheme dialect of Lisp. Imagine that you are sitting at a computer terminal.  You type an <term>expression</term>, and the interpreter responds by displaying the result of its <term>evaluating</term> that expression.</p>
+<p>One kind of primitive expression you might type is a number.  (More precisely, the expression that you type consists of the numerals that represent the number in base 10.)  If you present Lisp with a number</p>
+<code>486</code>
+<p>the interpreter will respond by printing<footnote><p>Throughout this book, when we wish to emphasize the distinction between the input typed by the user and the response printed by the interpreter, we will show the latter in slanted characters.   </p>
+</footnote></p>
+<result>486</result>
+<p>Expressions representing numbers may be combined with an expression representing a primitive procedure (such as <code>+</code> or <code>*</code>) to form a compound expression that represents the application of the procedure to those numbers.  For example:</p>
+<code>(+ 137 349)</code>
+<result>486</result>
+<code>(- 1000 334)</code>
+<result>666</result>
+<code>(* 5 99)</code>
+<result>495</result>
+<code>(/ 10 5)</code>
+<result>2</result>
+<code>(+ 2.7 10)</code>
+<result>12.7</result>
+<p>Expressions such as these, formed by delimiting a list of expressions within parentheses in order to denote procedure application, are called <term>combinations</term>.  The leftmost element in the list is called the <term>operator</term>, and the other elements are called <term>operands</term>.  The value of a combination is obtained by applying the procedure specified by the operator to the <term>arguments</term> that are the values of the operands.</p>
+<p>The convention of placing the operator to the left of the operands is known as <term>prefix notation</term>, and it may be somewhat confusing at first because it departs significantly from the customary mathematical convention.  Prefix notation has several advantages, however.  One of them is that it can accommodate procedures that may take an arbitrary number of arguments, as in the following examples:</p>
+<code>(+ 21 35 12 7)</code>
+<result>75</result>
+<code>(* 25 4 12)</code>
+<result>1200</result>
+<p>No ambiguity can arise, because the operator is always the leftmost element and the entire combination is delimited by the parentheses.</p>
+<p>A second advantage of prefix notation is that it extends in a straightforward way to allow combinations to be <term>nested</term>, that is, to have combinations whose elements are themselves combinations:</p>
+<code>(+ (* 3 5) (- 10 6))</code>
+<result>19</result>
+<p>There is no limit (in principle) to the depth of such nesting and to the overall complexity of the expressions that the Lisp interpreter can evaluate. It is we humans who get confused by still relatively simple expressions such as</p>
+<code>(+ (* 3 (+ (* 2 4) (+ 3 5))) (+ (- 10 7) 6))</code>
+<p>which the interpreter would readily evaluate to be 57.  We can help ourselves by writing such an expression in the form</p>
+<code>(+ (* 3
+      (+ (* 2 4)
+         (+ 3 5)))
+   (+ (- 10 7)
+      6))</code>
+<p>following a formatting convention known as <term>pretty-printing</term>, in which each long combination is written so that the operands are aligned vertically.  The resulting indentations display clearly the structure of the expression.<footnote><p>Lisp systems typically provide features to aid the user in formatting expressions.  Two especially useful features are one that automatically indents to the proper pretty-print position whenever a new line is started and one that highlights the matching left parenthesis whenever a right parenthesis is typed.   </p>
+</footnote></p>
+<p>Even with complex expressions, the interpreter always operates in the same basic cycle: It reads an expression from the terminal,  evaluates the expression, and prints the result. This mode of operation is often expressed by saying that the interpreter runs in a <term>read-eval-print loop</term>. Observe in particular that it is not necessary to explicitly instruct the interpreter to print the value of the expression.<footnote><p>Lisp obeys the convention that every expression has a value. This convention, together with the old reputation of Lisp as an inefficient language, is the source of the quip by Alan Perlis (paraphrasing Oscar Wilde) that "Lisp programmers know the value of everything but the cost of nothing."   </p>
+</footnote></p>
+</section>
 </section>
 </section>
 </body>
