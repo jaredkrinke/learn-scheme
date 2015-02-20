@@ -41,6 +41,7 @@ $(function () {
     var showEditor = (function () {
         var newText = '';
         editorModal.on('shown.bs.modal', function () {
+            output.val('');
             editor.setValue(newText.trim());
             editor.focus();
             editor.execCommand('goDocEnd');
