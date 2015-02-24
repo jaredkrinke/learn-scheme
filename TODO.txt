@@ -1,5 +1,5 @@
-(BIG) Need to handle discontinuous programs (e.g. defining a variable in one block and using it in another)
+(Ongoing...) Need to handle discontinuous programs (e.g. defining a variable in one block and using it in another)
 
 This footnote needs to be updated to reflect the new formatting:
-5Throughout this book, when we wish to emphasize the distinction between the input typed by the user and the response printed by the interpreter, we will show the latter in slanted characters.
+(Done) 5Throughout this book, when we wish to emphasize the distinction between the input typed by the user and the response printed by the interpreter, we will show the latter in slanted characters.
 

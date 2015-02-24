@@ -62,7 +62,7 @@
 <p>One easy way to get started at programming is to examine some typical interactions with an interpreter for the Scheme dialect of Lisp. Imagine that you are sitting at a computer terminal.  You type an <term>expression</term>, and the interpreter responds by displaying the result of its <term>evaluating</term> that expression.</p>
 <p>One kind of primitive expression you might type is a number.  (More precisely, the expression that you type consists of the numerals that represent the number in base 10.)  If you present Lisp with a number</p>
 <code>486</code>
-<p>the interpreter will respond by printing<footnote><p>Throughout this book, when we wish to emphasize the distinction between the input typed by the user and the response printed by the interpreter, we will show the latter in slanted characters.   </p>
+<p>the interpreter will respond by printing<footnote><p>Throughout this book, when we wish to emphasize the distinction between the input typed by the user and the response printed by the interpreter, we will show the latter in a block quote.   </p>
 </footnote></p>
 <result>486</result>
 <p>Expressions representing numbers may be combined with an expression representing a primitive procedure (such as <code>+</code> or <code>*</code>) to form a compound expression that represents the application of the procedure to those numbers.  For example:</p>
@@ -121,6 +121,77 @@ circumference</code>
 <p><code>Define</code> is our language's simplest means of abstraction, for it allows us to use simple names to refer to the results of compound operations, such as the <code>circumference</code> computed above. In general, computational objects may have very complex structures, and it would be extremely inconvenient to have to remember and repeat their details each time we want to use them.  Indeed, complex programs are constructed by building, step by step, computational objects of increasing complexity. The interpreter makes this step-by-step program construction particularly convenient because name-object associations can be created incrementally in successive interactions.  This feature encourages the incremental development and testing of programs and is largely responsible for the fact that a Lisp program usually consists of a large number of relatively simple procedures.</p>
 <p>It should be clear that the possibility of associating values with symbols and later retrieving them means that the interpreter must maintain some sort of memory that keeps track of the name-object pairs.  This memory is called the <term>environment</term> (more precisely the <term>global environment</term>, since we will see later that a computation may involve a number of different environments).<footnote><p>Chapter 3 will show that this notion of environment is crucial, both for understanding how the interpreter works and for implementing interpreters.   </p>
 </footnote></p>
+</section>
+<section title="Evaluating Combinations">
+<p>One of our goals in this chapter is to isolate issues about thinking procedurally.  As a case in point, let us consider that, in evaluating combinations, the interpreter is itself following a procedure.</p>
+<ul>
+<li>To evaluate a combination, do the following: </li>
+</ul>
+<p>1.  Evaluate the subexpressions of the combination.</p>
+<p>2.  Apply the procedure that is the value of the leftmost  subexpression (the operator) to the arguments that are the values of the other subexpressions (the operands). </p>
+<p>Even this simple rule illustrates some important points about processes in general.  First, observe that the first step dictates that in order to accomplish the evaluation process for a combination we must first perform the evaluation process on each element of the combination.  Thus, the evaluation rule is <term>recursive</term> in nature; that is, it includes, as one of its steps, the need to invoke the rule itself.<footnote><p>It may seem strange that the evaluation rule says, as part of the first step, that we should evaluate the leftmost element of a combination, since at this point that can only be an operator such as <code>+</code> or <code>*</code> representing a built-in primitive procedure such as addition or multiplication.  We will see later that it is useful to be able to work with combinations whose operators are themselves compound expressions.   </p>
+</footnote></p>
+<p>Notice how succinctly the idea of recursion can be used to express what, in the case of a deeply nested combination, would otherwise be viewed as a rather complicated process.  For example, evaluating</p>
+<code>(* (+ 2 (* 4 6))
+   (+ 3 5 7))</code>
+<p>requires that the evaluation rule be applied to four different combinations.  We can obtain a picture of this process by representing the combination in the form of a tree, as shown in figure 1.1.  Each combination is represented by a node with branches corresponding to the operator and the operands of the combination stemming from it. The terminal nodes (that is, nodes with no branches stemming from them) represent either operators or numbers. Viewing evaluation in terms of the tree, we can imagine that the values of the operands percolate upward, starting from the terminal nodes and then combining at higher and higher levels.  In general, we shall see that recursion is a very powerful technique for dealing with hierarchical, treelike objects.  In fact, the "percolate values upward" form of the evaluation rule is an example of a general kind of process known as <term>tree accumulation</term>.</p>
+
+<figure image="ch1-Z-G-1.gif"><caption>Tree representation, showing the value of each subcombination.</caption></figure>
+<p>Next, observe that the repeated application of the first step brings us to the point where we need to evaluate, not combinations, but primitive expressions such as numerals, built-in operators, or other names.  We take care of the primitive cases by stipulating that</p>
+<ul>
+<li>the values of numerals are the numbers that they name,  </li>
+<li>the values of built-in operators are the machine instruction sequences that carry out the corresponding operations, and  </li>
+<li>the values of other names are the objects associated  with those names in the environment. </li>
+</ul>
+<p>We may regard the second rule as a special case of the third one by stipulating that symbols such as <code>+</code> and <code>*</code> are also included in the global environment, and are associated with the sequences of machine instructions that are their "values."  The key point to notice is the role of the environment in determining the meaning of the symbols in expressions.  In an interactive language such as Lisp, it is meaningless to speak of the value of an expression such as <code>(+ x 1)</code> without specifying any information about the environment that would provide a meaning for the symbol <code>x</code> (or even for the symbol <code>+</code>).  As we shall see in chapter 3, the general notion of the environment as providing a context in which evaluation takes place will play an important role in our understanding of program execution.</p>
+<p>Notice that the evaluation rule given above does not handle definitions. For instance, evaluating <code>(define x 3)</code> does not apply <code>define</code> to two arguments, one of which is the value of the symbol <code>x</code> and the other of which is 3, since the purpose of the <code>define</code> is precisely to associate <code>x</code> with a value. (That is, <code>(define x 3)</code> is not a combination.)</p>
+<p>Such exceptions to the general evaluation rule are called <term>special forms</term>.  <code>Define</code> is the only example of a special form that we have seen so far, but we will meet others shortly.  Each special form has its own evaluation rule. The various kinds of expressions (each with its associated evaluation rule) constitute the syntax of the programming language.  In comparison with most other programming languages, Lisp has a very simple syntax; that is, the evaluation rule for expressions can be described by a simple general rule together with specialized rules for a small number of special forms.<footnote><p>Special syntactic forms that are simply convenient alternative surface structures for things that can be written in more uniform ways are sometimes called <term>syntactic sugar</term>, to use a phrase coined by Peter Landin.  In comparison with users of other languages, Lisp programmers, as a rule, are less concerned with matters of syntax.  (By contrast, examine any Pascal manual and notice how much of it is devoted to descriptions of syntax.)  This disdain for syntax is due partly to the flexibility of Lisp, which makes it easy to change surface syntax, and partly to the observation that many "convenient" syntactic constructs, which make the language less uniform, end up causing more trouble than they are worth when programs become large and complex.  In the words of Alan Perlis, "Syntactic sugar causes cancer of the semicolon."   </p>
+</footnote></p>
+</section>
+<section title="Compound Procedures">
+<p>We have identified in Lisp some of the elements that must appear in any powerful programming language:</p>
+<ul>
+<li>Numbers and arithmetic operations are  primitive data and procedures.  </li>
+<li>Nesting of combinations provides a means of  combining operations.  </li>
+<li>Definitions that associate names with values provide a limited means of abstraction. </li>
+</ul>
+<p>Now we will learn about <term>procedure definitions</term>, a much more powerful abstraction technique by which a compound operation can be given a name and then referred to as a unit.</p>
+<p>We begin by examining how to express the idea of "squaring."  We might say, "To square something, multiply it by itself."  This is expressed in our language as </p>
+<code>(define (square x) (* x x))</code>
+<p>We can understand this in the following way:</p>
+<code valid="false">(define (square  x)        (*         x     x))
+ To      square something, multiply   it by itself.</code>
+<p>We have here a <term>compound procedure</term>, which has been given the name <code>square</code>.  The procedure represents the operation of multiplying something by itself.  The thing to be multiplied is given a local name, <code>x</code>, which plays the same role that a pronoun plays in natural language.  Evaluating the definition creates this compound procedure and associates it with the name <code>square</code>.<footnote><p>Observe that there are two different operations being combined here: we are creating the procedure, and we are giving it the name <code>square</code>.  It is possible, indeed important, to be able to separate these two notions -- to create procedures without naming them, and to give names to procedures that have already been created.  We will see how to do this in section 1.3.2.   </p>
+</footnote></p>
+<p>The general form of a procedure definition is</p>
+<code valid="false">(define (&lt;name&gt; &lt;formal parameters&gt;) &lt;body&gt;)</code>
+<p>The &lt;<term>name</term>&gt; is a symbol to be associated with the procedure definition in the environment.<footnote><p>Throughout this book, we will describe the general syntax of expressions by using italic symbols delimited by angle brackets -- e.g., &lt;<term>name</term>&gt; -- to denote the "slots" in the expression to be filled in when such an expression is actually used.   </p>
+</footnote> The &lt;<term>formal parameters</term>&gt; are the names used within the body of the procedure to refer to the corresponding arguments of the procedure.  The &lt;<term>body</term>&gt; is an expression that will yield the value of the procedure application when the formal parameters are replaced by the actual arguments to which the procedure is applied.<footnote><p>More generally, the body of the procedure can be a sequence of expressions. In this case, the interpreter evaluates each expression in the sequence in turn and returns the value of the final expression as the value of the procedure application.   </p>
+</footnote> The &lt;<term>name</term>&gt; and the &lt;<term>formal parameters</term>&gt; are grouped within parentheses, just as they would be in an actual call to the procedure being defined.</p>
+<p>Having defined <code>square</code>, we can now use it:</p>
+<code><hidden>(define (square x) (* x x))</hidden>(square 21)</code>
+<result>441</result>
+<code><hidden>(define (square x) (* x x))</hidden>(square (+ 2 5))</code>
+<result>49</result>
+<code><hidden>(define (square x) (* x x))</hidden>(square (square 3))</code>
+<result>81</result>
+<p>We can also use <code>square</code> as a building block in defining other procedures.  For example, <term>x</term><sup>2</sup>  + <term>y</term><sup>2</sup> can be expressed as</p>
+<code valid="false">(+ (square x) (square y))</code>
+<p>We can easily define a procedure <code>sum-of-squares</code> that, given any two numbers as arguments, produces the sum of their squares:</p>
+<code><hidden>(define (square x) (* x x))</hidden>(define (sum-of-squares x y)
+  (+ (square x) (square y)))
+
+(sum-of-squares 3 4)</code>
+<result>25</result>
+<p>Now we can use <code>sum-of-squares</code> as a building block in constructing further procedures:</p>
+<code><hidden>(define (square x) (* x x))
+(define (sum-of-squares x y)
+  (+ (square x) (square y)))</hidden>(define (f a)
+  (sum-of-squares (+ a 1) (* a 2)))
+
+(f 5)</code>
+<result>136</result>
+<p>Compound procedures are used in exactly the same way as primitive procedures.  Indeed, one could not tell by looking at the definition of <code>sum-of-squares</code> given above whether <code>square</code> was built into the interpreter, like <code>+</code> and <code>*</code>, or defined as a compound procedure.</p>
 </section>
 </section>
 </section>
