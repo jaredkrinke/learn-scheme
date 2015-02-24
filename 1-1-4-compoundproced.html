@@ -1,0 +1,47 @@
+<!DOCTYPE html
+  PUBLIC "html">
+<meta xmlns:doc="http://jaredkrinke.github.io/doc" name="viewport" content="width=device-width, initial-scale=1"><html xmlns:doc="http://jaredkrinke.github.io/doc" lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>(learn scheme) - Compound Procedures</title><script src="http://code.jquery.com/jquery-2.1.1.min.js"></script><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css"><script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css"><link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/codemirror/4.8.0/codemirror.min.css"><script src="http://cdnjs.cloudflare.com/ajax/libs/codemirror/4.8.0/codemirror.js"></script><script src="http://cdnjs.cloudflare.com/ajax/libs/codemirror/4.8.0/mode/scheme/scheme.min.js"></script><script src="jsLisp.js"></script><script src="editor.js"></script><link rel="stylesheet" href="editor.css"></head><body><div class="container"><nav class="navbar navbar-default"><div class="navbar-header"><button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#top-bar"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button><span class="navbar-brand">(learn scheme)</span></div><div class="collapse navbar-collapse" id="top-bar"><ul class="nav navbar-nav"><li><a href="1-1-3-evaluatingcomb.html">&laquo; Previous</a></li><li class=""><a href="toc.html">Contents</a></li><li><a href="from-the-book.html">Next &raquo;</a></li></ul><form class="navbar-form navbar-right"><button id="launchEditor" type="button" class="btn btn-default">Launch Editor</button></form></div></nav><h1>Compound Procedures</h1>
+<p>We have identified in Lisp some of the elements that must appear in any powerful programming language:</p>
+<ul>
+<li>Numbers and arithmetic operations are  primitive data and procedures.  </li>
+<li>Nesting of combinations provides a means of  combining operations.  </li>
+<li>Definitions that associate names with values provide a limited means of abstraction. </li>
+</ul>
+<p>Now we will learn about <strong>procedure definitions</strong>, a much more powerful abstraction technique by which a compound operation can be given a name and then referred to as a unit.</p>
+<p>We begin by examining how to express the idea of "squaring."  We might say, "To square something, multiply it by itself."  This is expressed in our language as </p>
+<pre>(define (square x) (* x x))</pre>
+<p>We can understand this in the following way:</p>
+<pre class="code-invalid">(define (square  x)        (*         x     x))
+ To      square something, multiply   it by itself.</pre>
+<p>We have here a <strong>compound procedure</strong>, which has been given the name <code>square</code>.  The procedure represents the operation of multiplying something by itself.  The thing to be multiplied is given a local name, <code>x</code>, which plays the same role that a pronoun plays in natural language.  Evaluating the definition creates this compound procedure and associates it with the name <code>square</code>.<sup><a href="#footnote_12">12</a></sup></p>
+<p>The general form of a procedure definition is</p>
+<pre class="code-invalid">(define (&lt;name&gt; &lt;formal parameters&gt;) &lt;body&gt;)</pre>
+<p>The &lt;<strong>name</strong>&gt; is a symbol to be associated with the procedure definition in the environment.<sup><a href="#footnote_13">13</a></sup> The &lt;<strong>formal parameters</strong>&gt; are the names used within the body of the procedure to refer to the corresponding arguments of the procedure.  The &lt;<strong>body</strong>&gt; is an expression that will yield the value of the procedure application when the formal parameters are replaced by the actual arguments to which the procedure is applied.<sup><a href="#footnote_14">14</a></sup> The &lt;<strong>name</strong>&gt; and the &lt;<strong>formal parameters</strong>&gt; are grouped within parentheses, just as they would be in an actual call to the procedure being defined.</p>
+<p>Having defined <code>square</code>, we can now use it:</p>
+<div class="hidden hidden-code">(define (square x) (* x x))</div><pre>(square 21)</pre>
+<blockquote>441</blockquote>
+<div class="hidden hidden-code">(define (square x) (* x x))</div><pre>(square (+ 2 5))</pre>
+<blockquote>49</blockquote>
+<div class="hidden hidden-code">(define (square x) (* x x))</div><pre>(square (square 3))</pre>
+<blockquote>81</blockquote>
+<p>We can also use <code>square</code> as a building block in defining other procedures.  For example, <strong>x</strong><sup>2</sup>  + <strong>y</strong><sup>2</sup> can be expressed as</p>
+<pre class="code-invalid">(+ (square x) (square y))</pre>
+<p>We can easily define a procedure <code>sum-of-squares</code> that, given any two numbers as arguments, produces the sum of their squares:</p>
+<div class="hidden hidden-code">(define (square x) (* x x))</div><pre>(define (sum-of-squares x y)
+  (+ (square x) (square y)))
+
+(sum-of-squares 3 4)</pre>
+<blockquote>25</blockquote>
+<p>Now we can use <code>sum-of-squares</code> as a building block in constructing further procedures:</p>
+<div class="hidden hidden-code">(define (square x) (* x x))
+(define (sum-of-squares x y)
+  (+ (square x) (square y)))</div><pre>(define (f a)
+  (sum-of-squares (+ a 1) (* a 2)))
+
+(f 5)</pre>
+<blockquote>136</blockquote>
+<p>Compound procedures are used in exactly the same way as primitive procedures.  Indeed, one could not tell by looking at the definition of <code>sum-of-squares</code> given above whether <code>square</code> was built into the interpreter, like <code>+</code> and <code>*</code>, or defined as a compound procedure.</p>
+<hr><small><p><sup><a name="footnote_12"></a>12</sup>Observe that there are two different operations being combined here: we are creating the procedure, and we are giving it the name <code>square</code>.  It is possible, indeed important, to be able to separate these two notions -- to create procedures without naming them, and to give names to procedures that have already been created.  We will see how to do this in section 1.3.2.   </p>
+</small><small><p><sup><a name="footnote_13"></a>13</sup>Throughout this book, we will describe the general syntax of expressions by using italic symbols delimited by angle brackets -- e.g., &lt;<strong>name</strong>&gt; -- to denote the "slots" in the expression to be filled in when such an expression is actually used.   </p>
+</small><small><p><sup><a name="footnote_14"></a>14</sup>More generally, the body of the procedure can be a sequence of expressions. In this case, the interpreter evaluates each expression in the sequence in turn and returns the value of the final expression as the value of the procedure application.   </p>
+</small><nav><ul class="pager"><li><a href="1-1-3-evaluatingcomb.html"><span>&laquo; Previous</span></a></li><li><a href="toc.html">Contents</a></li><li><a href="from-the-book.html"><span>Next &raquo;</span></a></li></ul></nav><button id="tryItButton" class="hidden btn btn-info btn-xs pull-right">Try it</button></div><div id="editorModal" class="modal fade" tabindex="-1" role="dialog"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button><h4 class="modal-title">Scheme Interpreter</h4></div><div class="modal-body"><label for="editorInput">Input</label><textarea id="editorInput" class="form-control"></textarea></div><div class="modal-body"><label for="editorOutput">Output</label><textarea id="editorOutput" class="form-control"></textarea></div><div class="modal-footer"><button id="editorExecute" type="button" class="btn btn-primary">Evaluate</button><button id="editorDismiss" type="button" class="btn btn-default" data-dismiss="modal">Close</button></div></div></div></div></body></html>

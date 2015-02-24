@@ -63,27 +63,29 @@ $(function () {
     var tryItButton = $('#tryItButton');
     $('div.container > pre').each(function () {
         var element = $(this);
-        var text = '';
+        if (!element.hasClass('code-invalid')) {
+            var text = '';
 
-        // Prepend hidden code
-        var previous = element.prevAll(':first');
-        if (previous && previous.hasClass('hidden')) {
-            text += previous.text() + '\n\n';
+            // Prepend hidden code
+            var previous = element.prevAll(':first');
+            if (previous && previous.hasClass('hidden')) {
+                text += previous.text() + '\n\n';
+            }
+
+            // Now the real code
+            text += element.text();
+
+            var show = function () {
+                showEditor(text);
+            };
+
+            element
+                .dblclick(show)
+                .prepend(tryItButton
+                    .clone()
+                    .removeClass('hidden')
+                    .click(show));
         }
-
-        // Now the real code
-        text += element.text();
-
-        var show = function () {
-            showEditor(text);
-        };
-
-        element
-            .dblclick(show)
-            .prepend(tryItButton
-                .clone()
-                .removeClass('hidden')
-                .click(show));
     });
 });
 
