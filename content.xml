@@ -99,6 +99,29 @@
 <p>Even with complex expressions, the interpreter always operates in the same basic cycle: It reads an expression from the terminal,  evaluates the expression, and prints the result. This mode of operation is often expressed by saying that the interpreter runs in a <term>read-eval-print loop</term>. Observe in particular that it is not necessary to explicitly instruct the interpreter to print the value of the expression.<footnote><p>Lisp obeys the convention that every expression has a value. This convention, together with the old reputation of Lisp as an inefficient language, is the source of the quip by Alan Perlis (paraphrasing Oscar Wilde) that "Lisp programmers know the value of everything but the cost of nothing."   </p>
 </footnote></p>
 </section>
+<section title="Naming and the Environment">
+<p>A critical aspect of a programming language is the means it provides for using names to refer to computational objects.  We say that the name identifies a <term>variable</term> whose <term>value</term> is the object.</p>
+<p>In the Scheme dialect of Lisp, we name things with <code>define</code>.  Typing</p>
+<code>(define size 2)</code>
+<p>causes the interpreter to associate the value 2 with the name <code>size</code>.<footnote><p>In this book, we do not show the interpreter's response to evaluating definitions, since this is highly implementation-dependent.   </p>
+</footnote> Once the name <code>size</code> has been associated with the number 2, we can  refer to the value 2 by name:</p>
+<code><hidden>(define size 2)</hidden>size</code>
+<result>2</result>
+<code><hidden>(define size 2)</hidden>(* 5 size)</code>
+<result>10</result>
+<p>Here are further examples of the use of <code>define</code>:</p>
+<code>(define pi 3.14159)
+(define radius 10)
+(* pi (* radius radius))</code>
+<result>314.159</result>
+<code><hidden>(define pi 3.14159)
+(define radius 10)</hidden>(define circumference (* 2 pi radius))
+circumference</code>
+<result>62.8318</result>
+<p><code>Define</code> is our language's simplest means of abstraction, for it allows us to use simple names to refer to the results of compound operations, such as the <code>circumference</code> computed above. In general, computational objects may have very complex structures, and it would be extremely inconvenient to have to remember and repeat their details each time we want to use them.  Indeed, complex programs are constructed by building, step by step, computational objects of increasing complexity. The interpreter makes this step-by-step program construction particularly convenient because name-object associations can be created incrementally in successive interactions.  This feature encourages the incremental development and testing of programs and is largely responsible for the fact that a Lisp program usually consists of a large number of relatively simple procedures.</p>
+<p>It should be clear that the possibility of associating values with symbols and later retrieving them means that the interpreter must maintain some sort of memory that keeps track of the name-object pairs.  This memory is called the <term>environment</term> (more precisely the <term>global environment</term>, since we will see later that a computation may involve a number of different environments).<footnote><p>Chapter 3 will show that this notion of environment is crucial, both for understanding how the interpreter works and for implementing interpreters.   </p>
+</footnote></p>
+</section>
 </section>
 </section>
 </body>

@@ -8,7 +8,7 @@
         <xsl:variable name="previous" select="$pages/page[following-sibling::page[1]/@file = $file]"/>
         <xsl:variable name="next" select="$pages/page[preceding-sibling::page[1]/@file = $file]"/>
 
-            <xsl:result-document method="html" doctype-public="html" href="{$file}">
+            <xsl:result-document method="html" doctype-public="html" href="{$file}" indent="no">
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <html lang="en">
 <head>
@@ -305,6 +305,7 @@
         <strong><xsl:value-of select="text()"/></strong>
     </xsl:template>
     <xsl:template match="code">
+        <xsl:if test="count(hidden) > 0"><div class="hidden hidden-code"><xsl:copy-of select="hidden/text()"/></div></xsl:if>
         <pre><xsl:copy-of select="text()"/></pre>
     </xsl:template>
     <xsl:template match="p//code[count(parent::footnote) = 0] | figure/caption/code | ul//code">
