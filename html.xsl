@@ -306,7 +306,7 @@
     </xsl:template>
     <xsl:template match="code">
         <xsl:if test="count(hidden) > 0"><div class="hidden hidden-code"><xsl:copy-of select="hidden/text()"/></div></xsl:if>
-        <pre><xsl:copy-of select="text()"/></pre>
+        <xsl:element name="pre"><xsl:if test="@valid = 'false'"><xsl:attribute name="class">code-invalid</xsl:attribute></xsl:if><xsl:copy-of select="text()"/></xsl:element>
     </xsl:template>
     <xsl:template match="p//code[count(parent::footnote) = 0] | figure/caption/code | ul//code">
         <code><xsl:apply-templates select="node()"/></code>
