@@ -63,7 +63,17 @@ $(function () {
     var tryItButton = $('#tryItButton');
     $('div.container > pre').each(function () {
         var element = $(this);
-        var text = element.text();
+        var text = '';
+
+        // Prepend hidden code
+        var previous = element.prevAll(':first');
+        if (previous && previous.hasClass('hidden')) {
+            text += previous.text() + '\n\n';
+        }
+
+        // Now the real code
+        text += element.text();
+
         var show = function () {
             showEditor(text);
         };
