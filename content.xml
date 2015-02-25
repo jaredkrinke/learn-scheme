@@ -193,6 +193,151 @@ circumference</code>
 <result>136</result>
 <p>Compound procedures are used in exactly the same way as primitive procedures.  Indeed, one could not tell by looking at the definition of <code>sum-of-squares</code> given above whether <code>square</code> was built into the interpreter, like <code>+</code> and <code>*</code>, or defined as a compound procedure.</p>
 </section>
+<section title="The Substitution Model for Procedure Application">
+<p>To evaluate a combination whose operator names a compound procedure, the interpreter follows much the same process as for combinations whose operators name primitive procedures, which we described in section 1.1.3.  That is, the interpreter evaluates the elements of the combination and applies the procedure (which is the value of the operator of the combination) to the arguments (which are the values of the operands of the combination).</p>
+<p>We can assume that the mechanism for applying primitive procedures to arguments is built into the interpreter.  For compound procedures, the application process is as follows:</p>
+<ul>
+<li>To apply a compound procedure to arguments, evaluate the body of the procedure with each formal parameter replaced by the corresponding argument. </li>
+</ul>
+<p>To illustrate this process, let's evaluate the combination</p>
+<code valid="false">(f 5)</code>
+<p>where <code>f</code> is the procedure defined in section 1.1.4.  We begin by retrieving the body of <code>f</code>:</p>
+<code valid="false">(sum-of-squares (+ a 1) (* a 2))</code>
+<p>Then we replace the formal parameter <code>a</code> by the argument 5:</p>
+<code valid="false">(sum-of-squares (+ 5 1) (* 5 2))</code>
+<p>Thus the problem reduces to the evaluation of a combination with two operands and an operator <code>sum-of-squares</code>.  Evaluating this combination involves three subproblems.  We must evaluate the operator to get the procedure to be applied, and we must evaluate the operands to get the arguments.  Now <code>(+ 5 1)</code> produces 6 and <code>(* 5 2)</code> produces 10, so we must apply the <code>sum-of-squares</code> procedure to 6 and 10.  These values are substituted for the formal parameters <code>x</code> and <code>y</code> in the body of <code>sum-of-squares</code>, reducing the expression to</p>
+<code valid="false">(+ (square 6) (square 10))</code>
+<p>If we use the definition of <code>square</code>, this reduces to</p>
+<code valid="false">(+ (* 6 6) (* 10 10))</code>
+<p>which reduces by multiplication to</p>
+<code valid="false">(+ 36 100)</code>
+<p>and finally to</p>
+<code valid="false">136</code>
+<p>The process we have just described is called the <term>substitution model</term> for procedure application.  It can be taken as a model that determines the "meaning" of procedure application, insofar as the procedures in this chapter are concerned.  However, there are two points that should be stressed:</p>
+<ul>
+<li>The purpose of the substitution is to help us think about procedure application, not to provide a description of how the interpreter really works.  Typical interpreters do not evaluate procedure applications by manipulating the text of a procedure to substitute values for the formal parameters.  In practice, the "substitution" is accomplished by using a local environment for the formal parameters.  We will discuss this more fully in chapters 3 and 4 when we examine the implementation of an interpreter in detail.  </li>
+<li>Over the course of this book, we will present a sequence of increasingly elaborate models of how interpreters work, culminating with a complete implementation of an interpreter and compiler in chapter 5.  The substitution model is only the first of these models -- a way to get started thinking formally about the evaluation process.  In general, when modeling phenomena in science and engineering, we begin with simplified, incomplete models.  As we examine things in greater detail, these simple models become inadequate and must be replaced by more refined models.  The substitution model is no exception.  In particular, when we address in chapter 3 the use of procedures with "mutable data," we will see that the substitution model breaks down and must be replaced by a more complicated model of procedure application.<footnote><p>Despite the simplicity of the substitution idea, it turns out to be surprisingly complicated to give a rigorous mathematical definition of the substitution process.  The problem arises from the possibility of confusion between the names used for the formal parameters of a procedure and the (possibly identical) names used in the expressions to which the procedure may be applied.  Indeed, there is a long history of erroneous definitions of <term>substitution</term> in the literature of logic and programming semantics.  See Stoy 1977 for a careful discussion of substitution.   </p>
+</footnote> </li>
+</ul>
+<subsection title="Applicative order versus normal order"><p>According to the description of evaluation given in section 1.1.3, the interpreter first evaluates the operator and operands and then applies the resulting procedure to the resulting arguments.  This is not the only way to perform evaluation.  An alternative evaluation model would not evaluate the operands until their values were needed.  Instead it would first substitute operand expressions for parameters until it obtained an expression involving only primitive operators, and would then perform the evaluation.  If we used this method, the evaluation of</p>
+<code valid="false">(f 5)</code>
+<p>would proceed according to the sequence of expansions</p>
+<code valid="false">(sum-of-squares (+ 5 1) (* 5 2))
+
+(+    (square (+ 5 1))      (square (* 5 2))  )
+
+(+    (* (+ 5 1) (+ 5 1))   (* (* 5 2) (* 5 2)))</code>
+<p>followed by the reductions</p>
+<code valid="false">(+         (* 6 6)             (* 10 10))
+
+(+           36                   100)
+
+                    136</code>
+<p>This gives the same answer as our previous evaluation model, but the process is different.  In particular, the evaluations of <code>(+ 5 1)</code> and <code>(* 5 2)</code> are each performed twice here, corresponding to the reduction of the expression</p>
+<code valid="false">(* x x)</code>
+<p>with <code>x</code> replaced respectively by <code>(+ 5 1)</code> and <code>(* 5 2)</code>.</p>
+<p>This alternative "fully expand and then reduce" evaluation method is known as <term>normal-order evaluation</term>, in contrast to the "evaluate the arguments and then apply" method that the interpreter actually uses, which is called <term>applicative-order evaluation</term>.  It can be shown that, for procedure applications that can be modeled using substitution (including all the procedures in the first two chapters of this book) and that yield legitimate values, normal-order and applicative-order evaluation produce the same value.  (See exercise 1.5 for an instance of an "illegitimate" value where normal-order and applicative-order evaluation do not give the same result.)</p>
+<p>Lisp uses applicative-order evaluation, partly because of the additional efficiency obtained from avoiding multiple evaluations of expressions such as those illustrated with <code>(+ 5 1)</code> and <code>(* 5 2)</code> above and, more significantly, because normal-order evaluation becomes much more complicated to deal with when we leave the realm of procedures that can be modeled by substitution.  On the other hand, normal-order evaluation can be an extremely valuable tool, and we will investigate some of its implications in chapters 3 and 4.<footnote><p>In chapter 3 we will introduce <term>stream processing</term>, which is a way of handling apparently "infinite" data structures by incorporating a limited form of normal-order evaluation.  In section 4.2 we will modify the Scheme interpreter to produce a normal-order variant of Scheme.   </p>
+</footnote></p>
+</subsection>
+</section>
+<section title="Conditional Expressions and Predicates">
+<p>The expressive power of the class of procedures that we can define at this point is very limited, because we have no way to make tests and to perform different operations depending on the result of a test. For instance, we cannot define a procedure that computes the absolute value of a number by testing whether the number is positive, negative, or zero and taking different actions in the different cases according to the rule</p>
+
+<image path="ch1-Z-G-2.gif"/>
+<p>This construct is called a <term>case analysis</term>, and there is a special form in Lisp for notating such a case analysis.  It is called <code>cond</code> (which stands for "conditional"), and it is used as follows:</p>
+<code>(define (abs x)
+  (cond ((&gt; x 0) x)
+        ((= x 0) 0)
+        ((&lt; x 0) (- x))))</code>
+<p>The general form of a conditional expression is</p>
+<code valid="false">(cond (&lt;p1&gt; &lt;e1&gt;)
+      (&lt;p2&gt; &lt;e2&gt;)
+      
+      (&lt;pn&gt; &lt;en&gt;))</code>
+<p>consisting of the symbol <code>cond</code> followed by parenthesized pairs of expressions <code>(&lt;<term>p</term>&gt; &lt;<term>e</term>&gt;)</code> called <term>clauses</term>. The first expression in each pair is a <term>predicate</term> -- that is, an expression whose value is interpreted as either true or false.<footnote><p>"Interpreted as either true or false" means this: In Scheme, there are two distinguished values that are denoted by the constants <code>#t</code> and <code>#f</code>.  When the interpreter checks a predicate's value, it interprets <code>#f</code> as false.  Any other value is treated as true.  (Thus, providing <code>#t</code> is logically unnecessary, but it is convenient.)  In this book we will use names <code>true</code> and <code>false</code>, which are associated with the values <code>#t</code> and <code>#f</code> respectively.   </p>
+</footnote></p>
+<p>Conditional expressions are evaluated as follows.  The predicate &lt;<term>p<sub>1</sub></term>&gt; is evaluated first.  If its value is false, then &lt;<term>p<sub>2</sub></term>&gt; is evaluated.  If &lt;<term>p<sub>2</sub></term>&gt;'s value is also false, then &lt;<term>p<sub>3</sub></term>&gt; is evaluated.  This process continues until a predicate is found whose value is true, in which case the interpreter returns the value of the corresponding <term>consequent expression</term> &lt;<term>e</term>&gt; of the clause as the value of the conditional expression.  If none of the &lt;<term>p</term>&gt;'s is found to be true, the value of the <code>cond</code> is undefined.</p>
+<p>The word <term>predicate</term> is used for procedures that return true or false, as well as for expressions that evaluate to true or false. The absolute-value procedure ... makes use of the primitive predicates <code>&gt;</code>, <code>&lt;</code>, and <code>=</code>.<footnote><p>... also uses the "minus" operator <code>-</code>, which, when used with a single operand, as in <code>(- x)</code>, indicates negation.   </p>
+</footnote> These take two numbers as arguments and test whether the first number is, respectively, greater than, less than, or equal to the second number, returning true or false accordingly.</p>
+<p>Another way to write the absolute-value procedure is</p>
+<code>(define (abs x)
+  (cond ((&lt; x 0) (- x))
+        (else x)))</code>
+<p>which could be expressed in English as "If <term>x</term> is less than zero return  - <term>x</term>; otherwise return <term>x</term>."  <code>Else</code> is a special symbol that can be used in place of the &lt;<term>p</term>&gt; in the final clause of a <code>cond</code>.  This causes the <code>cond</code> to return as its value the value of the corresponding &lt;<term>e</term>&gt; whenever all previous clauses have been bypassed.  In fact, any expression that always evaluates to a true value could be used as the &lt;<term>p</term>&gt; here.</p>
+<p>Here is yet another way to write the absolute-value procedure:</p>
+<code>(define (abs x)
+  (if (&lt; x 0)
+      (- x)
+      x))</code>
+<p>This uses the special form <code>if</code>, a restricted type of conditional that can be used when there are precisely two cases in the case analysis.  The general form of an <code>if</code> expression is</p>
+<code valid="false">(if &lt;predicate&gt; &lt;consequent&gt; &lt;alternative&gt;)</code>
+<p>To evaluate an <code>if</code> expression, the interpreter starts by evaluating the &lt;<term>predicate</term>&gt; part of the expression.  If the &lt;<term>predicate</term>&gt; evaluates to a true value, the interpreter then evaluates the &lt;<term>consequent</term>&gt; and returns its value.  Otherwise it evaluates the &lt;<term>alternative</term>&gt; and returns its value.<footnote><p>A minor difference between <code>if</code> and <code>cond</code> is that the &lt;<term>e</term>&gt; part of each <code>cond</code> clause may be a sequence of expressions. If the corresponding &lt;<term>p</term>&gt; is found to be true, the expressions &lt;<term>e</term>&gt; are evaluated in sequence and the value of the final expression in the sequence is returned as the value of the <code>cond</code>. In an <code>if</code> expression, however, the &lt;<term>consequent</term>&gt; and &lt;<term>alternative</term>&gt; must be single expressions.   </p>
+</footnote></p>
+<p>In addition to primitive predicates such as <code>&lt;</code>, <code>=</code>, and <code>&gt;</code>, there are logical composition operations, which enable us to construct compound predicates.  The three most frequently used are these:</p>
+<ul>
+<li><code>(and &lt;<term>e<sub>1</sub></term>&gt; ... &lt;<term>e<sub><term>n</term></sub></term>&gt;)</code>  The interpreter evaluates the expressions &lt;<term>e</term>&gt; one at a time, in left-to-right order.  If any &lt;<term>e</term>&gt; evaluates to false, the value of the ... expression is false, and the rest of the &lt;<term>e</term>&gt;'s are not evaluated. If all &lt;<term>e</term>&gt;'s evaluate to true values, the value of the ... expression is the value of the last one.  </li>
+<li><code>(or &lt;<term>e<sub>1</sub></term>&gt; ... &lt;<term>e<sub><term>n</term></sub></term>&gt;)</code>  The interpreter evaluates the expressions &lt;<term>e</term>&gt; one at a time, in left-to-right order.  If any &lt;<term>e</term>&gt; evaluates to a true value, that value is returned as the value of the <code>or</code> expression, and the rest of the &lt;<term>e</term>&gt;'s are not evaluated. If all &lt;<term>e</term>&gt;'s evaluate to false, the value of the <code>or</code> expression is false.  </li>
+<li><code>(not &lt;<term>e</term>&gt;)</code>  The value of a ... expression is true when the expression &lt;<term>e</term>&gt; evaluates to false, and false otherwise. </li>
+</ul>
+<p>Notice that ... and <code>or</code> are special forms, not procedures, because the subexpressions are not necessarily all evaluated. ... is an ordinary procedure.</p>
+<p>As an example of how these are used, the condition that a number <term>x</term> be in the range 5 &lt; <term>x</term> &lt; 10 may be expressed as</p>
+<code valid="false">(and (&gt; x 5) (&lt; x 10))</code>
+<p>As another example, we can define a predicate to test whether one number is greater than or equal to another as</p>
+<code>(define (&gt;= x y)
+  (or (&gt; x y) (= x y)))</code>
+<p>or alternatively as</p>
+<code>(define (&gt;= x y)
+  (not (&lt; x y)))</code>
+
+<exercise><p>Below is a sequence of expressions.   What is the result printed by the interpreter in response to each expression?  Assume that the sequence is to be evaluated in the order in which it is presented.</p>
+<code>10
+(+ 5 3 4)
+(- 9 1)
+(/ 6 2)
+(+ (* 2 4) (- 4 6))
+(define a 3)
+(define b (+ a 1))
+(+ a b (* a b))
+(= a b)
+(if (and (&gt; b a) (&lt; b (* a b)))
+    b
+    a)
+(cond ((= a 4) 6)
+      ((= b 4) (+ 6 7 a))
+      (else 25))
+(+ 2 (if (&gt; b a) b a))
+(* (cond ((&gt; a b) a)
+         ((&lt; a b) b)
+         (else -1))
+   (+ a 1))</code>
+</exercise>
+
+<exercise><p>Translate the following expression into prefix form </p>
+
+<image path="ch1-Z-G-3.gif"/>
+</exercise>
+
+<exercise><p>Define a procedure that takes three numbers as arguments and returns the sum of the squares of the two larger numbers. </p>
+</exercise>
+
+<exercise><p>Observe that our model of evaluation allows for combinations whose operators are compound expressions.  Use this observation to describe the behavior of the following procedure: </p>
+<code>(define (a-plus-abs-b a b)
+  ((if (&gt; b 0) + -) a b))</code>
+</exercise>
+
+<exercise><p>Ben Bitdiddle has invented a test to determine whether the interpreter he is faced with is using applicative-order evaluation or normal-order evaluation.  He defines the following two procedures: </p>
+<code valid="false">(define (p) (p))
+
+(define (test x y)
+  (if (= x 0)
+      0
+      y))</code>
+<p>Then he evaluates the expression </p>
+<code>(test 0 (p))</code>
+<p>What behavior will Ben observe with an interpreter that uses applicative-order evaluation?  What behavior will he observe with an interpreter that uses normal-order evaluation?  Explain your answer. (Assume that the evaluation rule for the special form <code>if</code> is the same whether the interpreter is using normal or applicative order: The predicate expression is evaluated first, and the result determines whether to evaluate the consequent or the alternative expression.)  </p>
+</exercise>
+</section>
 </section>
 </section>
 </body>
