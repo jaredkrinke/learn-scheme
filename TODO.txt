@@ -1,3 +1,6 @@
+Code in tables should probably be red and not blocks...
+Need to test for code that contains incomplete definitions...
+
 (Ongoing...) Need to handle discontinuous programs (e.g. defining a variable in one block and using it in another)
 
 This footnote needs to be updated to reflect the new formatting:
