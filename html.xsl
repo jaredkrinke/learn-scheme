@@ -302,7 +302,7 @@
         </blockquote>
     </xsl:template>
     <xsl:template match="term">
-        <strong><xsl:value-of select="text()"/></strong>
+        <xsl:apply-templates select="node()"/>
     </xsl:template>
     <xsl:template match="code">
         <xsl:if test="count(hidden) > 0"><div class="hidden hidden-code"><xsl:copy-of select="hidden/text()"/></div></xsl:if>
