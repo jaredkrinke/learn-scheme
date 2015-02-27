@@ -1,0 +1,175 @@
+<!DOCTYPE html
+  PUBLIC "html">
+<meta xmlns:doc="http://jaredkrinke.github.io/doc" name="viewport" content="width=device-width, initial-scale=1"><html xmlns:doc="http://jaredkrinke.github.io/doc" lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>(learn scheme) - Example: Square Roots by Newton's Method</title><script src="http://code.jquery.com/jquery-2.1.1.min.js"></script><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css"><script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css"><link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/codemirror/4.8.0/codemirror.min.css"><script src="http://cdnjs.cloudflare.com/ajax/libs/codemirror/4.8.0/codemirror.js"></script><script src="http://cdnjs.cloudflare.com/ajax/libs/codemirror/4.8.0/mode/scheme/scheme.min.js"></script><script src="jsLisp.js"></script><script src="editor.js"></script><link rel="stylesheet" href="editor.css"></head><body><div class="container"><nav class="navbar navbar-default"><div class="navbar-header"><button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#top-bar"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button><span class="navbar-brand">(learn scheme)</span></div><div class="collapse navbar-collapse" id="top-bar"><ul class="nav navbar-nav"><li><a href="1-1-6-conditionalexp.html">&laquo; Previous</a></li><li class=""><a href="toc.html">Contents</a></li><li><a href="1-1-8-proceduresasbl.html">Next &raquo;</a></li></ul><form class="navbar-form navbar-right"><button id="launchEditor" type="button" class="btn btn-default">Launch Editor</button></form></div></nav><h1>Example: Square Roots by Newton's Method</h1>
+<p>Procedures, as introduced above, are much like ordinary mathematical functions.  They specify a value that is determined by one or more parameters.  But there is an important difference between mathematical functions and computer procedures.  Procedures must be effective.</p>
+<p>As a case in point, consider the problem of computing square roots.  We can define the square-root function as </p>
+
+<div class=".pull-left"><img src="ch1-Z-G-4.gif"></div>
+<p>This describes a perfectly legitimate mathematical function.  We could use it to recognize whether one number is the square root of another, or to derive facts about square roots in general.  On the other hand, the definition does not describe a procedure.  Indeed, it tells us almost nothing about how to actually find the square root of a given number.  It will not help matters to rephrase this definition in pseudo-Lisp:</p>
+<pre>(define (sqrt x)
+  (the y (and (&gt;= y 0)
+              (= (square y) x))))</pre>
+<p>This only begs the question.</p>
+<p>The contrast between function and procedure is a reflection of the general distinction between describing properties of things and describing how to do things, or, as it is sometimes referred to, the distinction between declarative knowledge and imperative knowledge. In mathematics we are usually concerned with declarative (what is) descriptions, whereas in computer science we are usually concerned with imperative (how to) descriptions.<sup><a href="#footnote_20">20</a></sup></p>
+<p>How does one compute square roots?  The most common way is to use Newton's method of successive approximations, which says that whenever we have a guess <strong>y</strong> for the value of the square root of a number <strong>x</strong>, we can perform a simple manipulation to get a better guess (one closer to the actual square root) by averaging <strong>y</strong> with <strong>x</strong>/<strong>y</strong>.<sup><a href="#footnote_21">21</a></sup> For example, we can compute the square root of 2 as follows.  Suppose our initial guess is 1:</p>
+<table class="table" border="0"><tr><td valign="top">Guess </td><td valign="top">Quotient </td><td valign="top">Average</td></tr>
+<tr><td valign="top">  </td></tr>
+<tr><td valign="top">1      </td><td valign="top"> (2/1)  =  2        </td><td valign="top">
+((2 + 1)/2)  =  1.5 </td></tr>
+<tr><td valign="top">  </td></tr>
+<tr><td valign="top">1.5    </td><td valign="top"> (2/1.5)  =  1.3333 </td><td valign="top">
+((1.3333 + 1.5)/2)  =  1.4167 </td></tr>
+<tr><td valign="top">  </td></tr>
+<tr><td valign="top">1.4167 </td><td valign="top"> (2/1.4167)  =  1.4118 </td><td valign="top">
+((1.4167 + 1.4118)/2)  =  1.4142 </td></tr>
+<tr><td valign="top">  </td></tr>
+<tr><td valign="top">1.4142 </td><td valign="top">...</td><td valign="top">...</td></tr>
+<tr><td valign="top"></td></tr></table><p>Continuing this process, we obtain better and better approximations to the square root.</p>
+<p>Now let's formalize the process in terms of procedures.  We start with a value for the radicand (the number whose square root we are trying to compute) and a value for the guess.  If the guess is good enough for our purposes, we are done; if not, we must repeat the process with an improved guess.  We write this basic strategy as a procedure:</p>
+<pre class="code-invalid">(define (sqrt-iter guess x)
+  (if (good-enough? guess x)
+      guess
+      (sqrt-iter (improve guess x)
+                 x)))</pre>
+<p>A guess is improved by averaging it with the quotient of the radicand and the old guess:</p>
+<pre class="code-invalid">(define (improve guess x)
+  (average guess (/ x guess)))</pre>
+<p>where</p>
+<pre>(define (average x y)
+  (/ (+ x y) 2))</pre>
+<p>We also have to say what we mean by "good enough."  The following will do for illustration, but it is not really a very good test.  (See exercise 1.7.) The idea is to improve the answer until it is close enough so that its square differs from the radicand by less than a predetermined tolerance (here 0.001):<sup><a href="#footnote_22">22</a></sup></p>
+<div class="hidden hidden-code">(define (square x) (* x x))
+(define (abs x)
+  (if (&lt; x 0)
+      (- x)
+      x))</div><pre>(define (good-enough? guess x)
+  (&lt; (abs (- (square guess) x)) 0.001))</pre>
+<p>Finally, we need a way to get started.  For instance, we can always guess that the square root of any number is 1:<sup><a href="#footnote_23">23</a></sup></p>
+<div class="hidden hidden-code">(define (square x) (* x x))
+(define (abs x)
+  (if (&lt; x 0)
+      (- x)
+      x))
+(define (sqrt-iter guess x)
+  (if (good-enough? guess x)
+      guess
+      (sqrt-iter (improve guess x)
+                 x)))
+(define (improve guess x)
+  (average guess (/ x guess)))
+(define (average x y)
+  (/ (+ x y) 2))
+(define (good-enough? guess x)
+  (&lt; (abs (- (square guess) x)) 0.001))</div><pre>(define (sqrt x)
+  (sqrt-iter 1.0 x))</pre>
+<p>If we type these definitions to the interpreter, we can use <code>sqrt</code> just as we can use any procedure:</p>
+<div class="hidden hidden-code">(define (square x) (* x x))
+(define (abs x)
+  (if (&lt; x 0)
+      (- x)
+      x))
+(define (sqrt-iter guess x)
+  (if (good-enough? guess x)
+      guess
+      (sqrt-iter (improve guess x)
+                 x)))
+(define (improve guess x)
+  (average guess (/ x guess)))
+(define (average x y)
+  (/ (+ x y) 2))
+(define (good-enough? guess x)
+  (&lt; (abs (- (square guess) x)) 0.001))
+(define (sqrt x)
+  (sqrt-iter 1.0 x))</div><pre>(sqrt 9)</pre>
+<blockquote>3.00009155413138</blockquote>
+<div class="hidden hidden-code">(define (square x) (* x x))
+(define (abs x)
+  (if (&lt; x 0)
+      (- x)
+      x))
+(define (sqrt-iter guess x)
+  (if (good-enough? guess x)
+      guess
+      (sqrt-iter (improve guess x)
+                 x)))
+(define (improve guess x)
+  (average guess (/ x guess)))
+(define (average x y)
+  (/ (+ x y) 2))
+(define (good-enough? guess x)
+  (&lt; (abs (- (square guess) x)) 0.001))
+(define (sqrt x)
+  (sqrt-iter 1.0 x))</div><pre>(sqrt (+ 100 37))</pre>
+<blockquote>11.704699917758145</blockquote>
+<div class="hidden hidden-code">(define (square x) (* x x))
+(define (abs x)
+  (if (&lt; x 0)
+      (- x)
+      x))
+(define (sqrt-iter guess x)
+  (if (good-enough? guess x)
+      guess
+      (sqrt-iter (improve guess x)
+                 x)))
+(define (improve guess x)
+  (average guess (/ x guess)))
+(define (average x y)
+  (/ (+ x y) 2))
+(define (good-enough? guess x)
+  (&lt; (abs (- (square guess) x)) 0.001))
+(define (sqrt x)
+  (sqrt-iter 1.0 x))</div><pre>(sqrt (+ (sqrt 2) (sqrt 3)))</pre>
+<blockquote>1.7739279023207892</blockquote>
+<div class="hidden hidden-code">(define (square x) (* x x))
+(define (abs x)
+  (if (&lt; x 0)
+      (- x)
+      x))
+(define (sqrt-iter guess x)
+  (if (good-enough? guess x)
+      guess
+      (sqrt-iter (improve guess x)
+                 x)))
+(define (improve guess x)
+  (average guess (/ x guess)))
+(define (average x y)
+  (/ (+ x y) 2))
+(define (good-enough? guess x)
+  (&lt; (abs (- (square guess) x)) 0.001))
+(define (sqrt x)
+  (sqrt-iter 1.0 x))</div><pre>(square (sqrt 1000))</pre>
+<blockquote>1000.000369924366</blockquote>
+<p>The <code>sqrt</code> program also illustrates that the simple procedural language we have introduced so far is sufficient for writing any purely numerical program that one could write in, say, C or Pascal.  This might seem surprising, since we have not included in our language any iterative (looping) constructs that direct the computer to do something over and over again.  <code>Sqrt-iter</code>, on the other hand, demonstrates how iteration can be accomplished using no special construct other than the ordinary ability to call a procedure.<sup><a href="#footnote_24">24</a></sup>  </p>
+
+<u>Exercise 1.6</u><p>Alyssa P. Hacker doesn't see why <code>if</code> needs to be provided as a special form.  "Why can't I just define it as an ordinary procedure in terms of <code>cond</code>?" she asks. Alyssa's friend Eva Lu Ator claims this can indeed be done, and she defines a new version of <code>if</code>:</p>
+<pre class="code-invalid">(define (new-if predicate then-clause else-clause)
+  (cond (predicate then-clause)
+        (else else-clause)))</pre>
+<p>Eva demonstrates the program for Alyssa:</p>
+<pre class="code-invalid">(new-if (= 2 3) 0 5)</pre>
+<blockquote>5</blockquote>
+<pre class="code-invalid">(new-if (= 1 1) 0 5)</pre>
+<blockquote>0</blockquote>
+<p>Delighted, Alyssa uses <code>new-if</code> to rewrite the square-root program:</p>
+<pre class="code-invalid">(define (sqrt-iter guess x)
+  (new-if (good-enough? guess x)
+          guess
+          (sqrt-iter (improve guess x)
+                     x)))</pre>
+<p>What happens when Alyssa attempts to use this to compute square roots? Explain.  </p>
+
+
+<u>Exercise 1.7</u><p>The <code>good-enough?</code> test used in computing square roots will not be very effective for finding the square roots of very small numbers. Also, in real computers, arithmetic operations are almost always performed with limited precision.  This makes our test inadequate for very large numbers.  Explain these statements, with examples showing how the test fails for small and large numbers.  An alternative strategy for implementing <code>good-enough?</code> is to watch how <code>guess</code> changes from one iteration to the next and to stop when the change is a very small fraction of the guess.  Design a square-root procedure that uses this kind of end test.  Does this work better for small and large numbers? </p>
+
+
+<u>Exercise 1.8</u><p>Newton's method for cube roots is based on the fact that if <strong>y</strong> is an approximation to the cube root of <strong>x</strong>, then a better approximation is given by the value </p>
+
+<div class=".pull-left"><img src="ch1-Z-G-5.gif"></div>
+<p>Use this formula to implement a cube-root procedure analogous to the square-root procedure.  (In section 1.3.4 we will see how to implement Newton's method in general as an abstraction of these square-root and cube-root procedures.) </p>
+
+<hr><small><p><sup><a name="footnote_20"></a>20</sup>Declarative and imperative descriptions are intimately related, as indeed are mathematics and computer science.  For instance, to say that the answer produced by a program is "correct" is to make a declarative statement about the program.  There is a large amount of research aimed at establishing techniques for proving that programs are correct, and much of the technical difficulty of this subject has to do with negotiating the transition between imperative statements (from which programs are constructed) and declarative statements (which can be used to deduce things).  In a related vein, an important current area in programming-language design is the exploration of so-called very high-level languages, in which one actually programs in terms of declarative statements.  The idea is to make interpreters sophisticated enough so that, given "what is" knowledge specified by the programmer, they can generate "how to" knowledge automatically. This cannot be done in general, but there are important areas where progress has been made.  We shall revisit this idea in chapter 4.   </p>
+</small><small><p><sup><a name="footnote_21"></a>21</sup>This square-root algorithm is actually a special case of Newton's method, which is a general technique for finding roots of equations.  The square-root algorithm itself was developed by Heron of Alexandria in the first century A.D.  We will see how to express the general Newton's method as a Lisp procedure in section 1.3.4.   </p>
+</small><small><p><sup><a name="footnote_22"></a>22</sup>We will usually give predicates names ending with question marks, to help us remember that they are predicates.  This is just a stylistic convention.  As far as the interpreter is concerned, the question mark is just an ordinary character.   </p>
+</small><small><p><sup><a name="footnote_23"></a>23</sup>Observe that we express our initial guess as 1.0 rather than 1.  This would not make any difference in many Lisp implementations. MIT Scheme, however, distinguishes between exact integers and decimal values, and dividing two integers produces a rational number rather than a decimal.  For example, dividing 10 by 6 yields 5/3, while dividing 10.0 by 6.0 yields 1.6666666666666667.  (We will learn how to implement arithmetic on rational numbers in section 2.1.1.)  If we start with an initial guess of 1 in our square-root program, and <strong>x</strong> is an exact integer, all subsequent values produced in the square-root computation will be rational numbers rather than decimals.  Mixed operations on rational numbers and decimals always yield decimals, so starting with an initial guess of 1.0 forces all subsequent values to be decimals.   </p>
+</small><small><p><sup><a name="footnote_24"></a>24</sup>Readers who are worried about the efficiency issues involved in using procedure calls to implement iteration should note the remarks on "tail recursion" in section 1.2.1.   </p>
+</small><nav><ul class="pager"><li><a href="1-1-6-conditionalexp.html"><span>&laquo; Previous</span></a></li><li><a href="toc.html">Contents</a></li><li><a href="1-1-8-proceduresasbl.html"><span>Next &raquo;</span></a></li></ul></nav><button id="tryItButton" class="hidden btn btn-info btn-xs pull-right">Try it</button></div><div id="editorModal" class="modal fade" tabindex="-1" role="dialog"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button><h4 class="modal-title">Scheme Interpreter</h4></div><div class="modal-body"><label for="editorInput">Input</label><textarea id="editorInput" class="form-control"></textarea></div><div class="modal-body"><label for="editorOutput">Output</label><textarea id="editorOutput" class="form-control"></textarea></div><div class="modal-footer"><button id="editorExecute" type="button" class="btn btn-primary">Evaluate</button><button id="editorDismiss" type="button" class="btn btn-default" data-dismiss="modal">Close</button></div></div></div></div></body></html>
