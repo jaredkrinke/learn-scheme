@@ -1,5 +1,8 @@
 Code in tables should probably be red and not blocks (just remove the code tags)...
 Need to test for code that contains incomplete definitions...
+Maybe require code to be marked invalid or have a (hidden) test?
+
+*** Section 1.1.8 needs to have exp and log defined in jsLisp!
 
 (Ongoing...) Need to handle discontinuous programs (e.g. defining a variable in one block and using it in another)
 

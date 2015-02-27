@@ -344,7 +344,7 @@ circumference</code>
 
 <image path="ch1-Z-G-4.gif"/>
 <p>This describes a perfectly legitimate mathematical function.  We could use it to recognize whether one number is the square root of another, or to derive facts about square roots in general.  On the other hand, the definition does not describe a procedure.  Indeed, it tells us almost nothing about how to actually find the square root of a given number.  It will not help matters to rephrase this definition in pseudo-Lisp:</p>
-<code>(define (sqrt x)
+<code valid="false">(define (sqrt x)
   (the y (and (&gt;= y 0)
               (= (square y) x))))</code>
 <p>This only begs the question.</p>
@@ -353,18 +353,14 @@ circumference</code>
 <p>How does one compute square roots?  The most common way is to use Newton's method of successive approximations, which says that whenever we have a guess <term>y</term> for the value of the square root of a number <term>x</term>, we can perform a simple manipulation to get a better guess (one closer to the actual square root) by averaging <term>y</term> with <term>x</term>/<term>y</term>.<footnote><p>This square-root algorithm is actually a special case of Newton's method, which is a general technique for finding roots of equations.  The square-root algorithm itself was developed by Heron of Alexandria in the first century A.D.  We will see how to express the general Newton's method as a Lisp procedure in section 1.3.4.   </p>
 </footnote> For example, we can compute the square root of 2 as follows.  Suppose our initial guess is 1:</p>
 <table class="table" border="0"><tr><td valign="top" >Guess </td><td valign="top" >Quotient </td><td valign="top" >Average</td></tr>
-<tr><td valign="top" >  </td></tr>
 <tr><td valign="top" >1      </td><td valign="top" > (2/1)  =  2        </td><td valign="top" >
 ((2 + 1)/2)  =  1.5 </td></tr>
-<tr><td valign="top" >  </td></tr>
 <tr><td valign="top" >1.5    </td><td valign="top" > (2/1.5)  =  1.3333 </td><td valign="top" >
 ((1.3333 + 1.5)/2)  =  1.4167 </td></tr>
-<tr><td valign="top" >  </td></tr>
 <tr><td valign="top" >1.4167 </td><td valign="top" > (2/1.4167)  =  1.4118 </td><td valign="top" >
 ((1.4167 + 1.4118)/2)  =  1.4142 </td></tr>
-<tr><td valign="top" >  </td></tr>
 <tr><td valign="top" >1.4142 </td><td valign="top" >...</td><td valign="top" >...</td></tr>
-<tr><td valign="top" ></td></tr></table><p>Continuing this process, we obtain better and better approximations to the square root.</p>
+</table><p>Continuing this process, we obtain better and better approximations to the square root.</p>
 <p>Now let's formalize the process in terms of procedures.  We start with a value for the radicand (the number whose square root we are trying to compute) and a value for the guess.  If the guess is good enough for our purposes, we are done; if not, we must repeat the process with an improved guess.  We write this basic strategy as a procedure:</p>
 <code valid="false">(define (sqrt-iter guess x)
   (if (good-enough? guess x)
@@ -527,11 +523,11 @@ circumference</code>
 (define (double x) (+ x x))</code>
 <p>So a procedure definition should be able to suppress detail.  The users of the procedure may not have written the procedure themselves, but may have obtained it from another programmer as a black box.  A user should not need to know how the procedure is implemented in order to use it.</p>
 <subsection title="Local names"><p>One detail of a procedure's implementation that should not matter to the user of the procedure is the implementer's choice of names for the procedure's formal parameters.  Thus, the following procedures should not be distinguishable:</p>
-<code>(define (square x) (* x x))
+<code valid="false">(define (square x) (* x x))
 
 (define (square y) (* y y))</code>
 <p>This principle -- that the meaning of a procedure should be independent of the parameter names used by its author -- seems on the surface to be self-evident, but its consequences are profound.  The simplest consequence is that the parameter names of a procedure must be local to the body of the procedure.  For example, we used <code>square</code> in the definition of <code>good-enough?</code> in our square-root procedure:</p>
-<code>(define (good-enough? guess x)
+<code valid="false">(define (good-enough? guess x)
   (&lt; (abs (- (square guess) x)) 0.001))</code>
 <p>The intention of the author of <code>good-enough?</code> is to determine if the square of the first argument is within a given tolerance of the second argument.  We see that the author of <code>good-enough?</code> used the name <code>guess</code> to refer to the first argument and <code>x</code> to refer to the second argument.  The argument of <code>square</code> is <code>guess</code>.  If the author of <code>square</code> used <code>x</code> (as above) to refer to that argument, we see that the <code>x</code> in <code>good-enough?</code> must be a different <code>x</code> than the one in <code>square</code>.  Running the procedure <code>square</code> must not affect the value of <code>x</code> that is used by <code>good-enough?</code>, because that value of <code>x</code> may be needed by <code>good-enough?</code> after <code>square</code> is done computing.</p>
 <p>If the parameters were not local to the bodies of their respective procedures, then the parameter <code>x</code> in <code>square</code> could be confused with the parameter <code>x</code> in <code>good-enough?</code>, and the behavior of <code>good-enough?</code> would depend upon which version of <code>square</code> we used.  Thus, <code>square</code> would not be the black box we desired.</p>
@@ -540,7 +536,9 @@ circumference</code>
 <p>In the definition of <code>good-enough?</code> above, <code>guess</code> and <code>x</code> are bound variables but <code>&lt;</code>, <code>-</code>, ..., and <code>square</code> are free. The meaning of <code>good-enough?</code> should be independent of the names we choose for <code>guess</code> and <code>x</code> so long as they are distinct and different from <code>&lt;</code>, <code>-</code>, ..., and <code>square</code>.  (If we renamed <code>guess</code> to ... we would have introduced a bug by <term>capturing</term> the variable ....  It would have changed from free to bound.)  The meaning of <code>good-enough?</code> is not independent of the names of its free variables, however.  It surely depends upon the fact (external to this definition) that the symbol ... names a procedure for computing the absolute value of a number.  <code>Good-enough?</code> will compute a different function if we substitute ... for ... in its definition.</p>
 </subsection>
 <subsection title="Internal definitions and block structure"><p>We have one kind of name isolation available to us so far: The formal parameters of a procedure are local to the body of the procedure.  The square-root program illustrates another way in which we would like to control the use of names.  The existing program consists of separate procedures:</p>
-<code><hidden>(define (square x) (* x x))</hidden>(define (sqrt x)
+<code><hidden>(define (square x) (* x x))
+(define (abs x) (if (&lt; x 0) (- x) x))
+(define (average x y) (/ (+ x y) 2))</hidden>(define (sqrt x)
   (sqrt-iter 1.0 x))
 (define (sqrt-iter guess x)
   (if (good-enough? guess x)
@@ -551,7 +549,9 @@ circumference</code>
 (define (improve guess x)
   (average guess (/ x guess)))</code>
 <p>The problem with this program is that the only procedure that is important to users of <code>sqrt</code> is <code>sqrt</code>.  The other procedures (<code>sqrt-iter</code>, <code>good-enough?</code>, and <code>improve</code>) only clutter up their minds.  They may not define any other procedure called <code>good-enough?</code> as part of another program to work together with the square-root program, because <code>sqrt</code> needs it.  The problem is especially severe in the construction of large systems by many separate programmers.  For example, in the construction of a large library of numerical procedures, many numerical functions are computed as successive approximations and thus might have procedures named <code>good-enough?</code> and <code>improve</code> as auxiliary procedures. We would like to localize the subprocedures, hiding them inside <code>sqrt</code> so that <code>sqrt</code> could coexist with other successive approximations, each having its own private <code>good-enough?</code> procedure.  To make this possible, we allow a procedure to have internal definitions that are local to that procedure.  For example, in the square-root problem we can write</p>
-<code>(define (sqrt x)
+<code><hidden>(define (square x) (* x x))
+(define (abs x) (if (&lt; x 0) (- x) x))
+(define (average x y) (/ (+ x y) 2))</hidden>(define (sqrt x)
   (define (good-enough? guess x)
     (&lt; (abs (- (square guess) x)) 0.001))
   (define (improve guess x)
@@ -563,7 +563,9 @@ circumference</code>
   (sqrt-iter 1.0 x))</code>
 <p>Such nesting of definitions, called <term>block structure</term>, is basically the right solution to the simplest  name-packaging problem.  But there is a better idea lurking here.  In addition to internalizing the definitions of the auxiliary procedures, we can simplify them.  Since <code>x</code> is bound in the definition of <code>sqrt</code>, the procedures <code>good-enough?</code>, <code>improve</code>, and <code>sqrt-iter</code>, which are defined internally to <code>sqrt</code>, are in the scope of <code>x</code>.  Thus, it is not necessary to pass <code>x</code> explicitly to each of these procedures.  Instead, we allow <code>x</code> to be a free variable in the internal definitions, as shown below. Then <code>x</code> gets its value from the argument with which the enclosing procedure <code>sqrt</code> is called.  This discipline is called <term>lexical scoping</term>.<footnote><p>Lexical scoping dictates that free variables in a procedure are taken to refer to bindings made by enclosing procedure definitions; that is, they are looked up in the environment in which the procedure was defined.  We will see how this works in detail in chapter 3 when we study environments and the detailed behavior of the interpreter.   </p>
 </footnote></p>
-<code>(define (sqrt x)
+<code><hidden>(define (square x) (* x x))
+(define (abs x) (if (&lt; x 0) (- x) x))
+(define (average x y) (/ (+ x y) 2))</hidden>(define (sqrt x)
   (define (good-enough? guess)
     (&lt; (abs (- (square guess) x)) 0.001))
   (define (improve guess)
