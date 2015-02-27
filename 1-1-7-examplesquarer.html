@@ -6,25 +6,21 @@
 
 <div class=".pull-left"><img src="ch1-Z-G-4.gif"></div>
 <p>This describes a perfectly legitimate mathematical function.  We could use it to recognize whether one number is the square root of another, or to derive facts about square roots in general.  On the other hand, the definition does not describe a procedure.  Indeed, it tells us almost nothing about how to actually find the square root of a given number.  It will not help matters to rephrase this definition in pseudo-Lisp:</p>
-<pre>(define (sqrt x)
+<pre class="code-invalid">(define (sqrt x)
   (the y (and (&gt;= y 0)
               (= (square y) x))))</pre>
 <p>This only begs the question.</p>
 <p>The contrast between function and procedure is a reflection of the general distinction between describing properties of things and describing how to do things, or, as it is sometimes referred to, the distinction between declarative knowledge and imperative knowledge. In mathematics we are usually concerned with declarative (what is) descriptions, whereas in computer science we are usually concerned with imperative (how to) descriptions.<sup><a href="#footnote_20">20</a></sup></p>
 <p>How does one compute square roots?  The most common way is to use Newton's method of successive approximations, which says that whenever we have a guess <strong>y</strong> for the value of the square root of a number <strong>x</strong>, we can perform a simple manipulation to get a better guess (one closer to the actual square root) by averaging <strong>y</strong> with <strong>x</strong>/<strong>y</strong>.<sup><a href="#footnote_21">21</a></sup> For example, we can compute the square root of 2 as follows.  Suppose our initial guess is 1:</p>
 <table class="table" border="0"><tr><td valign="top">Guess </td><td valign="top">Quotient </td><td valign="top">Average</td></tr>
-<tr><td valign="top">  </td></tr>
 <tr><td valign="top">1      </td><td valign="top"> (2/1)  =  2        </td><td valign="top">
 ((2 + 1)/2)  =  1.5 </td></tr>
-<tr><td valign="top">  </td></tr>
 <tr><td valign="top">1.5    </td><td valign="top"> (2/1.5)  =  1.3333 </td><td valign="top">
 ((1.3333 + 1.5)/2)  =  1.4167 </td></tr>
-<tr><td valign="top">  </td></tr>
 <tr><td valign="top">1.4167 </td><td valign="top"> (2/1.4167)  =  1.4118 </td><td valign="top">
 ((1.4167 + 1.4118)/2)  =  1.4142 </td></tr>
-<tr><td valign="top">  </td></tr>
 <tr><td valign="top">1.4142 </td><td valign="top">...</td><td valign="top">...</td></tr>
-<tr><td valign="top"></td></tr></table><p>Continuing this process, we obtain better and better approximations to the square root.</p>
+</table><p>Continuing this process, we obtain better and better approximations to the square root.</p>
 <p>Now let's formalize the process in terms of procedures.  We start with a value for the radicand (the number whose square root we are trying to compute) and a value for the guess.  If the guess is good enough for our purposes, we are done; if not, we must repeat the process with an improved guess.  We write this basic strategy as a procedure:</p>
 <pre class="code-invalid">(define (sqrt-iter guess x)
   (if (good-enough? guess x)

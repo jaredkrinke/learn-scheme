@@ -16,11 +16,11 @@
 (define (double x) (+ x x))</pre>
 <p>So a procedure definition should be able to suppress detail.  The users of the procedure may not have written the procedure themselves, but may have obtained it from another programmer as a black box.  A user should not need to know how the procedure is implemented in order to use it.</p>
 <h2>Local names</h2><p>One detail of a procedure's implementation that should not matter to the user of the procedure is the implementer's choice of names for the procedure's formal parameters.  Thus, the following procedures should not be distinguishable:</p>
-<pre>(define (square x) (* x x))
+<pre class="code-invalid">(define (square x) (* x x))
 
 (define (square y) (* y y))</pre>
 <p>This principle -- that the meaning of a procedure should be independent of the parameter names used by its author -- seems on the surface to be self-evident, but its consequences are profound.  The simplest consequence is that the parameter names of a procedure must be local to the body of the procedure.  For example, we used <code>square</code> in the definition of <code>good-enough?</code> in our square-root procedure:</p>
-<pre>(define (good-enough? guess x)
+<pre class="code-invalid">(define (good-enough? guess x)
   (&lt; (abs (- (square guess) x)) 0.001))</pre>
 <p>The intention of the author of <code>good-enough?</code> is to determine if the square of the first argument is within a given tolerance of the second argument.  We see that the author of <code>good-enough?</code> used the name <code>guess</code> to refer to the first argument and <code>x</code> to refer to the second argument.  The argument of <code>square</code> is <code>guess</code>.  If the author of <code>square</code> used <code>x</code> (as above) to refer to that argument, we see that the <code>x</code> in <code>good-enough?</code> must be a different <code>x</code> than the one in <code>square</code>.  Running the procedure <code>square</code> must not affect the value of <code>x</code> that is used by <code>good-enough?</code>, because that value of <code>x</code> may be needed by <code>good-enough?</code> after <code>square</code> is done computing.</p>
 <p>If the parameters were not local to the bodies of their respective procedures, then the parameter <code>x</code> in <code>square</code> could be confused with the parameter <code>x</code> in <code>good-enough?</code>, and the behavior of <code>good-enough?</code> would depend upon which version of <code>square</code> we used.  Thus, <code>square</code> would not be the black box we desired.</p>
@@ -28,7 +28,9 @@
 <p>In the definition of <code>good-enough?</code> above, <code>guess</code> and <code>x</code> are bound variables but <code>&lt;</code>, <code>-</code>, ..., and <code>square</code> are free. The meaning of <code>good-enough?</code> should be independent of the names we choose for <code>guess</code> and <code>x</code> so long as they are distinct and different from <code>&lt;</code>, <code>-</code>, ..., and <code>square</code>.  (If we renamed <code>guess</code> to ... we would have introduced a bug by <strong>capturing</strong> the variable ....  It would have changed from free to bound.)  The meaning of <code>good-enough?</code> is not independent of the names of its free variables, however.  It surely depends upon the fact (external to this definition) that the symbol ... names a procedure for computing the absolute value of a number.  <code>Good-enough?</code> will compute a different function if we substitute ... for ... in its definition.</p>
 
 <h2>Internal definitions and block structure</h2><p>We have one kind of name isolation available to us so far: The formal parameters of a procedure are local to the body of the procedure.  The square-root program illustrates another way in which we would like to control the use of names.  The existing program consists of separate procedures:</p>
-<div class="hidden hidden-code">(define (square x) (* x x))</div><pre>(define (sqrt x)
+<div class="hidden hidden-code">(define (square x) (* x x))
+(define (abs x) (if (&lt; x 0) (- x) x))
+(define (average x y) (/ (+ x y) 2))</div><pre>(define (sqrt x)
   (sqrt-iter 1.0 x))
 (define (sqrt-iter guess x)
   (if (good-enough? guess x)
@@ -39,7 +41,9 @@
 (define (improve guess x)
   (average guess (/ x guess)))</pre>
 <p>The problem with this program is that the only procedure that is important to users of <code>sqrt</code> is <code>sqrt</code>.  The other procedures (<code>sqrt-iter</code>, <code>good-enough?</code>, and <code>improve</code>) only clutter up their minds.  They may not define any other procedure called <code>good-enough?</code> as part of another program to work together with the square-root program, because <code>sqrt</code> needs it.  The problem is especially severe in the construction of large systems by many separate programmers.  For example, in the construction of a large library of numerical procedures, many numerical functions are computed as successive approximations and thus might have procedures named <code>good-enough?</code> and <code>improve</code> as auxiliary procedures. We would like to localize the subprocedures, hiding them inside <code>sqrt</code> so that <code>sqrt</code> could coexist with other successive approximations, each having its own private <code>good-enough?</code> procedure.  To make this possible, we allow a procedure to have internal definitions that are local to that procedure.  For example, in the square-root problem we can write</p>
-<pre>(define (sqrt x)
+<div class="hidden hidden-code">(define (square x) (* x x))
+(define (abs x) (if (&lt; x 0) (- x) x))
+(define (average x y) (/ (+ x y) 2))</div><pre>(define (sqrt x)
   (define (good-enough? guess x)
     (&lt; (abs (- (square guess) x)) 0.001))
   (define (improve guess x)
@@ -50,7 +54,9 @@
         (sqrt-iter (improve guess x) x)))
   (sqrt-iter 1.0 x))</pre>
 <p>Such nesting of definitions, called <strong>block structure</strong>, is basically the right solution to the simplest  name-packaging problem.  But there is a better idea lurking here.  In addition to internalizing the definitions of the auxiliary procedures, we can simplify them.  Since <code>x</code> is bound in the definition of <code>sqrt</code>, the procedures <code>good-enough?</code>, <code>improve</code>, and <code>sqrt-iter</code>, which are defined internally to <code>sqrt</code>, are in the scope of <code>x</code>.  Thus, it is not necessary to pass <code>x</code> explicitly to each of these procedures.  Instead, we allow <code>x</code> to be a free variable in the internal definitions, as shown below. Then <code>x</code> gets its value from the argument with which the enclosing procedure <code>sqrt</code> is called.  This discipline is called <strong>lexical scoping</strong>.<sup><a href="#footnote_27">27</a></sup></p>
-<pre>(define (sqrt x)
+<div class="hidden hidden-code">(define (square x) (* x x))
+(define (abs x) (if (&lt; x 0) (- x) x))
+(define (average x y) (/ (+ x y) 2))</div><pre>(define (sqrt x)
   (define (good-enough? guess)
     (&lt; (abs (- (square guess) x)) 0.001))
   (define (improve guess)
