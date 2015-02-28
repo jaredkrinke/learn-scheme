@@ -8,9 +8,8 @@
                 Procedural decomposition of the <code>sqrt</code> program.</small></p></div>
 <p>The importance of this decomposition strategy is not simply that one is dividing the program into parts.  After all, we could take any large program and divide it into parts -- the first ten lines, the next ten lines, the next ten lines, and so on.  Rather, it is crucial that each procedure accomplishes an identifiable task that can be used as a module in defining other procedures.  For example, when we define the <code>good-enough?</code> procedure in terms of <code>square</code>, we are able to regard the <code>square</code> procedure as a "black box."  We are not at that moment concerned with <strong>how</strong> the procedure computes its result, only with the fact that it computes the square.  The details of how the square is computed can be suppressed, to be considered at a later time.  Indeed, as far as the <code>good-enough?</code> procedure is concerned, <code>square</code> is not quite a procedure but rather an abstraction of a procedure, a so-called <strong>procedural abstraction</strong>. At this level of abstraction, any procedure that computes the square is equally good.</p>
 <p>Thus, considering only the values they return, the following two procedures for squaring a number should be indistinguishable.  Each takes a numerical argument and produces the square of that number as the value.<sup><a href="#footnote_25">25</a></sup></p>
-<pre>(define (square x) (* x x))
-
-(define (square x) 
+<pre>(define (square x) (* x x))</pre>
+<pre>(define (square x) 
   (exp (double (log x))))
 
 (define (double x) (+ x x))</pre>

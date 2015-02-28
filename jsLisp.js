@@ -209,6 +209,9 @@
             remainder: function (a, b) { return parseFloat(a) % parseFloat(b); },
             random: function (n) { return Math.floor(Math.random() * n); },
 
+            'log': function (a) { return Math.log(parseFloat(a)); },
+            'exp': function (a) { return Math.exp(parseFloat(a)); },
+
             '>': function (a, b) { return parseFloat(a) > parseFloat(b); },
             '>=': function (a, b) { return parseFloat(a) >= parseFloat(b); },
             '=': function (a, b) { return parseFloat(a) === parseFloat(b); },
