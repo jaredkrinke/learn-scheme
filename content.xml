@@ -515,12 +515,11 @@ circumference</code>
 <p>The importance of this decomposition strategy is not simply that one is dividing the program into parts.  After all, we could take any large program and divide it into parts -- the first ten lines, the next ten lines, the next ten lines, and so on.  Rather, it is crucial that each procedure accomplishes an identifiable task that can be used as a module in defining other procedures.  For example, when we define the <code>good-enough?</code> procedure in terms of <code>square</code>, we are able to regard the <code>square</code> procedure as a "black box."  We are not at that moment concerned with <term>how</term> the procedure computes its result, only with the fact that it computes the square.  The details of how the square is computed can be suppressed, to be considered at a later time.  Indeed, as far as the <code>good-enough?</code> procedure is concerned, <code>square</code> is not quite a procedure but rather an abstraction of a procedure, a so-called <term>procedural abstraction</term>. At this level of abstraction, any procedure that computes the square is equally good.</p>
 <p>Thus, considering only the values they return, the following two procedures for squaring a number should be indistinguishable.  Each takes a numerical argument and produces the square of that number as the value.<footnote><p>It is not even clear which of these procedures is a more efficient implementation.  This depends upon the hardware available.  There are machines for which the "obvious" implementation is the less efficient one.  Consider a machine that has extensive tables of logarithms and antilogarithms stored in a very efficient manner.   </p>
 </footnote></p>
-<code>(define (square x) (* x x))
-
-(define (square x) 
+<code>(define (square x) (* x x))<extra>(square 3)</extra><expected>9</expected></code>
+<code>(define (square x) 
   (exp (double (log x))))
 
-(define (double x) (+ x x))</code>
+(define (double x) (+ x x))<extra>(square 3)</extra><expected>9</expected></code>
 <p>So a procedure definition should be able to suppress detail.  The users of the procedure may not have written the procedure themselves, but may have obtained it from another programmer as a black box.  A user should not need to know how the procedure is implemented in order to use it.</p>
 <subsection title="Local names"><p>One detail of a procedure's implementation that should not matter to the user of the procedure is the implementer's choice of names for the procedure's formal parameters.  Thus, the following procedures should not be distinguishable:</p>
 <code valid="false">(define (square x) (* x x))
