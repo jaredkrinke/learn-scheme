@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
 <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:doc="http://jaredkrinke.github.io/doc">
+    <xsl:variable name="cover-file" select="'index.html'"/>
     <xsl:variable name="toc-file" select="'toc.html'"/>
-    <xsl:template name="page">
+    <xsl:template name="page-custom">
         <xsl:param name="title"/>
         <xsl:param name="file"/>
         <xsl:param name="body"/>
@@ -39,7 +40,7 @@
       <span class="icon-bar"></span>
       <span class="icon-bar"></span>
     </button>
-    <span class="navbar-brand"><xsl:value-of select="$brand"/></span>
+    <a class="navbar-brand" href="{$cover-file}"><xsl:value-of select="$brand"/></a>
   </div>
   
   <div class="collapse navbar-collapse" id="top-bar">
@@ -57,8 +58,6 @@
     </form>
   </div>
 </nav>
-
-<h1><xsl:value-of select="$title"/></h1>
 
 <xsl:copy-of select="$body"/>
 
@@ -103,6 +102,20 @@
 </html>
 
         </xsl:result-document>
+    </xsl:template>
+
+    <xsl:template name="page">
+        <xsl:param name="title"/>
+        <xsl:param name="file"/>
+        <xsl:param name="body"/>
+        <xsl:call-template name="page-custom">
+            <xsl:with-param name="title" select="$title"/>
+            <xsl:with-param name="file" select="$file"/>
+            <xsl:with-param name="body">
+                <h1><xsl:value-of select="$title"/></h1>
+                <xsl:copy-of select="$body"/>
+            </xsl:with-param>
+        </xsl:call-template>
     </xsl:template>
 
     <xsl:template match="footnote" mode="footnotes">
@@ -227,11 +240,23 @@
 
     <!-- Set up navigation -->
     <xsl:variable name="pages">
+        <page file="{$cover-file}"/>
         <page file="{$toc-file}"/>
         <xsl:for-each select="$annotated//section">
             <page file="{doc:section-file(.)}"/>
         </xsl:for-each>
     </xsl:variable>
+
+    <!-- Cover -->
+    <xsl:template name="cover">
+        <xsl:call-template name="page-custom">
+            <xsl:with-param name="title" select="//cover/@title"/>
+            <xsl:with-param name="file" select="$cover-file"/>
+            <xsl:with-param name="body">
+                <xsl:apply-templates select="//cover/*"/>
+            </xsl:with-param>
+        </xsl:call-template>
+    </xsl:template>
 
     <!-- Table of contents -->
     <xsl:template name="table-of-contents-item">
@@ -341,6 +366,7 @@
     </xsl:template>
 
     <xsl:template match="/">
+        <xsl:call-template name="cover"/>
         <xsl:call-template name="table-of-contents"/>
         <xsl:call-template name="content-pages"/>
     </xsl:template>
