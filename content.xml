@@ -297,10 +297,10 @@ circumference</code>
 <code valid="false">(and (&gt; x 5) (&lt; x 10))</code>
 <p>As another example, we can define a predicate to test whether one number is greater than or equal to another as</p>
 <code>(define (&gt;= x y)
-  (or (&gt; x y) (= x y)))<extra>(&gt;= 2 2)</extra><expected>true</expected></code>
+  (or (&gt; x y) (= x y)))<extra>(&gt;= 2 2)</extra><expected>#t</expected></code>
 <p>or alternatively as</p>
 <code>(define (&gt;= x y)
-  (not (&lt; x y)))<extra>(&gt; 2 3)</extra><expected>false</expected></code>
+  (not (&lt; x y)))<extra>(&gt; 2 3)</extra><expected>#f</expected></code>
 
 <exercise><p>Below is a sequence of expressions.   What is the result printed by the interpreter in response to each expression?  Assume that the sequence is to be evaluated in the order in which it is presented.</p>
 <code valid="false">10
@@ -392,7 +392,7 @@ circumference</code>
   (if (&lt; x 0)
       (- x)
       x))</hidden>(define (good-enough? guess x)
-  (&lt; (abs (- (square guess) x)) 0.001))<extra>(good-enough? 2.9999 9)</extra><expected>true</expected></code>
+  (&lt; (abs (- (square guess) x)) 0.001))<extra>(good-enough? 2.9999 9)</extra><expected>#t</expected></code>
 <p>Finally, we need a way to get started.  For instance, we can always guess that the square root of any number is 1:</p>
 <code><hidden>(define (square x) (* x x))
 (define (abs x)
