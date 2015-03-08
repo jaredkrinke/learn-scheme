@@ -9,6 +9,7 @@
         var output = [];
         var state = tokenizerState.initial;
         var token;
+        // TODO: Implement comments
         for (var i = 0, count = input.length; i < count; i++) {
             switch (state) {
                 case tokenizerState.initial:
@@ -22,6 +23,7 @@
 
                             case ' ':
                             case '\n':
+                            case '\r':
                                 break;
 
                             case '"':
@@ -50,6 +52,7 @@
 
                             case ' ':
                             case '\n':
+                            case '\r':
                                 output.push(token);
                                 state = tokenizerState.initial;
                                 break;
@@ -226,6 +229,8 @@
             'symbol?': function (a) { return parseIdentifier(a) !== null; },
             'true': true,
             'false': false,
+            '#t': true,
+            '#f': false,
 
             // Lists
             cons: function (a, b) { return createPair(a, b); },
@@ -494,6 +499,10 @@
                 output += format(value.head);
                 output += value.tail ? ' ' : ')';
             }
+        } else if (value === true) {
+            output = '#t';
+        } else if (value === false) {
+            output = '#f';
         } else {
             output = value.toString();
         }
