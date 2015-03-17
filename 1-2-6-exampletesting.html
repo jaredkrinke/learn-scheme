@@ -1,0 +1,132 @@
+<!DOCTYPE html
+  PUBLIC "html">
+<meta xmlns:doc="http://jaredkrinke.github.io/doc" name="viewport" content="width=device-width, initial-scale=1"><html xmlns:doc="http://jaredkrinke.github.io/doc" lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>(learn 'scheme) - Example: Testing for Primality</title><script src="http://code.jquery.com/jquery-2.1.1.min.js"></script><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css"><script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css"><link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/codemirror/4.8.0/codemirror.min.css"><script src="http://cdnjs.cloudflare.com/ajax/libs/codemirror/4.8.0/codemirror.js"></script><script src="http://cdnjs.cloudflare.com/ajax/libs/codemirror/4.8.0/mode/scheme/scheme.min.js"></script><script src="jsLisp.js"></script><script src="editor.js"></script><link rel="stylesheet" href="editor.css"></head><body><div class="container"><nav class="navbar navbar-default"><div class="navbar-header"><button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#top-bar"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button><a class="navbar-brand" href="index.html">(learn 'scheme)</a></div><div class="collapse navbar-collapse" id="top-bar"><ul class="nav navbar-nav"><li><a href="1-2-5-greatestcommon.html">&laquo; Previous</a></li><li class=""><a href="toc.html">Contents</a></li><li><a href="from-the-book.html">Next &raquo;</a></li></ul><form class="navbar-form navbar-right"><button id="launchEditor" type="button" class="btn btn-default">Launch Editor</button></form></div></nav><h1>Example: Testing for Primality</h1>
+<p>This section describes two methods for checking the primality of an integer <strong>n</strong>, one with order of growth <img src="book-Z-G-D-3.gif" border="0">(<img src="book-Z-G-D-13.gif" border="0"><strong>n</strong>), and a "probabilistic" algorithm with order of growth <img src="book-Z-G-D-3.gif" border="0">(<code>log</code> <strong>n</strong>).  The exercises at the end of this section suggest programming projects based on these algorithms.</p>
+<h2>Searching for divisors</h2><p>Since ancient times, mathematicians have been fascinated by problems concerning prime numbers, and many people have worked on the problem of determining ways to test if numbers are prime.  One way to test if a number is prime is to find the number's divisors.  The following program finds the smallest integral divisor (greater than 1) of a given number <strong>n</strong>.  It does this in a straightforward way, by testing <strong>n</strong> for divisibility by successive integers starting with 2.</p>
+<div class="hidden hidden-code">(define (square x) (* x x))</div><pre>(define (smallest-divisor n)
+  (find-divisor n 2))
+(define (find-divisor n test-divisor)
+  (cond ((&gt; (square test-divisor) n) n)
+        ((divides? test-divisor n) test-divisor)
+        (else (find-divisor n (+ test-divisor 1)))))
+(define (divides? a b)
+  (= (remainder b a) 0))</pre>
+<p>We can test whether a number is prime as follows: <strong>n</strong> is prime if and only if <strong>n</strong> is its own smallest divisor.</p>
+<div class="hidden hidden-code">(define (smallest-divisor n)
+  (find-divisor n 2))
+(define (find-divisor n test-divisor)
+  (cond ((&gt; (square test-divisor) n) n)
+        ((divides? test-divisor n) test-divisor)
+        (else (find-divisor n (+ test-divisor 1)))))
+(define (divides? a b)
+  (= (remainder b a) 0))
+(define (square x) (* x x))</div><pre>(define (prime? n)
+  (= n (smallest-divisor n)))</pre>
+<p>The end test for <code>find-divisor</code> is based on the fact that if <strong>n</strong> is not prime it must have a divisor less than or equal to <img src="book-Z-G-D-13.gif" border="0"><strong>n</strong>.<sup><a href="#footnote_43">43</a></sup>  This means that the algorithm need only test divisors between 1 and <img src="book-Z-G-D-13.gif" border="0"><strong>n</strong>.  Consequently, the number of steps required to identify <strong>n</strong> as prime will have order of growth <img src="book-Z-G-D-3.gif" border="0">(<img src="book-Z-G-D-13.gif" border="0"><strong>n</strong>).</p>
+
+<h2>The Fermat test</h2><p>The <img src="book-Z-G-D-3.gif" border="0">(<code>log</code> <strong>n</strong>) primality test is based on a result from number theory known as Fermat's Little Theorem.<sup><a href="#footnote_44">44</a></sup></p>
+<p>(Two numbers are said to be <strong>congruent modulo</strong> <strong>n</strong> if they both have the same remainder when divided by <strong>n</strong>.  The remainder of a number <strong>a</strong> when divided by <strong>n</strong> is also referred to as the <strong>remainder of</strong> <strong>a</strong> <strong>modulo</strong> <strong>n</strong>, or simply as <strong>a</strong>  <strong>modulo</strong> <strong>n</strong>.)</p>
+<p>If <strong>n</strong> is not prime, then, in general, most of the numbers <strong>a</strong>&lt; <strong>n</strong> will not satisfy the above relation.  This leads to the following algorithm for testing primality: Given a number <strong>n</strong>, pick a random number <strong>a</strong> &lt; <strong>n</strong> and compute the remainder of <strong>a</strong><sup><strong>n</strong></sup> modulo <strong>n</strong>.  If the result is not equal to <strong>a</strong>, then <strong>n</strong> is certainly not prime.  If it is <strong>a</strong>, then chances are good that <strong>n</strong> is prime.  Now pick another random number <strong>a</strong> and test it with the same method.  If it also satisfies the equation, then we can be even more confident that <strong>n</strong> is prime.  By trying more and more values of <strong>a</strong>, we can increase our confidence in the result.  This algorithm is known as the Fermat test.</p>
+<p>To implement the Fermat test, we need a procedure that computes the exponential of a number modulo another number:</p>
+<div class="hidden hidden-code">(define (even? n) (= (remainder n 2) 0))
+(define (square x) (* x x))</div><pre>(define (expmod base exp m)
+  (cond ((= exp 0) 1)
+        ((even? exp)
+         (remainder (square (expmod base (/ exp 2) m))
+                    m))
+        (else
+         (remainder (* base (expmod base (- exp 1) m))
+                    m))))</pre>
+<p>This is very similar to the <code>fast-expt</code> procedure of section 1.2.4.  It uses successive squaring, so that the number of steps grows logarithmically with the exponent.<sup><a href="#footnote_45">45</a></sup></p>
+<p>The Fermat test is performed by choosing at random a number <strong>a</strong> between 1 and <strong>n</strong> - 1 inclusive and checking whether the remainder modulo <strong>n</strong> of the <strong>n</strong>th power of <strong>a</strong> is equal to <strong>a</strong>.  The random number <strong>a</strong> is chosen using the procedure <code>random</code>, which we assume is included as a primitive in Scheme. <code>Random</code> returns a nonnegative integer less than its integer input.  Hence, to obtain a random number between 1 and <strong>n</strong> - 1, we call <code>random</code> with an input of <strong>n</strong> - 1 and add 1 to the result:</p>
+<div class="hidden hidden-code">(define (expmod base exp m)
+  (cond ((= exp 0) 1)
+        ((even? exp)
+         (remainder (square (expmod base (/ exp 2) m))
+                    m))
+        (else
+         (remainder (* base (expmod base (- exp 1) m))
+                    m))))
+(define (square x) (* x x))
+(define (even? n) (= (remainder n 2) 0))</div><pre>(define (fermat-test n)
+  (define (try-it a)
+    (= (expmod a n n) a))
+  (try-it (+ 1 (random (- n 1)))))</pre>
+<p>The following procedure runs the test a given number of times, as specified by a parameter.  Its value is true if the test succeeds every time, and false otherwise.</p>
+<div class="hidden hidden-code">(define (expmod base exp m)
+  (cond ((= exp 0) 1)
+        ((even? exp)
+         (remainder (square (expmod base (/ exp 2) m))
+                    m))
+        (else
+         (remainder (* base (expmod base (- exp 1) m))
+                    m))))
+(define (even? n) (= (remainder n 2) 0))
+(define (square x) (* x x))
+(define (fermat-test n)
+  (define (try-it a)
+    (= (expmod a n n) a))
+  (try-it (+ 1 (random (- n 1)))))</div><pre>(define (fast-prime? n times)
+  (cond ((= times 0) true)
+        ((fermat-test n) (fast-prime? n (- times 1)))
+        (else false)))</pre>
+
+<h2>Probabilistic methods</h2><p>The Fermat test differs in character from most familiar algorithms, in which one computes an answer that is guaranteed to be correct.  Here, the answer obtained is only probably correct.  More precisely, if <strong>n</strong> ever fails the Fermat test, we can be certain that <strong>n</strong> is not prime. But the fact that <strong>n</strong> passes the test, while an extremely strong indication, is still not a guarantee that <strong>n</strong> is prime.  What we would like to say is that for any number <strong>n</strong>, if we perform the test enough times and find that <strong>n</strong> always passes the test, then the probability of error in our primality test can be made as small as we like.</p>
+<p>Unfortunately, this assertion is not quite correct.  There do exist numbers that fool the Fermat test: numbers <strong>n</strong> that are not prime and yet have the property that <strong>a</strong><sup><strong>n</strong></sup> is congruent to <strong>a</strong> modulo <strong>n</strong> for all integers <strong>a</strong> &lt; <strong>n</strong>.  Such numbers are extremely rare, so the Fermat test is quite reliable in practice.<sup><a href="#footnote_46">46</a></sup> There are variations of the Fermat test that cannot be fooled.  In these tests, as with the Fermat method, one tests the primality of an integer <strong>n</strong> by choosing a random integer <strong>a</strong>&lt;<strong>n</strong> and checking some condition that depends upon <strong>n</strong> and <strong>a</strong>.  (See exercise 1.28 for an example of such a test.)  On the other hand, in contrast to the Fermat test, one can prove that, for any <strong>n</strong>, the condition does not hold for most of the integers <strong>a</strong>&lt;<strong>n</strong> unless <strong>n</strong> is prime.  Thus, if <strong>n</strong> passes the test for some random choice of <strong>a</strong>, the chances are better than even that <strong>n</strong> is prime.  If <strong>n</strong> passes the test for two random choices of <strong>a</strong>, the chances are better than 3 out of 4 that <strong>n</strong> is prime. By running the test with more and more randomly chosen values of <strong>a</strong> we can make the probability of error as small as we like.</p>
+<p>The existence of tests for which one can prove that the chance of error becomes arbitrarily small has sparked interest in algorithms of this type, which have come to be known as <strong>probabilistic algorithms</strong>.  There is a great deal of research activity in this area, and probabilistic algorithms have been fruitfully applied to many fields.<sup><a href="#footnote_47">47</a></sup></p>
+
+
+<u>Exercise 1.21</u><p>Use the <code>smallest-divisor</code> procedure to find the smallest divisor of each of the following numbers: 199, 1999, 19999. </p>
+
+
+<u>Exercise 1.22</u><p>Most Lisp implementations include a primitive called <code>runtime</code> that returns an integer that specifies the amount of time the system has been running (measured, for example, in microseconds).  The following <code>timed-prime-test</code> procedure, when called with an integer <strong>n</strong>, prints <strong>n</strong> and checks to see if <strong>n</strong> is prime.  If <strong>n</strong> is prime, the procedure prints three asterisks followed by the amount of time used in performing the test.</p>
+<pre>(define (timed-prime-test n)
+  (newline)
+  (display n)
+  (start-prime-test n (runtime)))
+(define (start-prime-test n start-time)
+  (if (prime? n)
+      (report-prime (- (runtime) start-time))))
+(define (report-prime elapsed-time)
+  (display " *** ")
+  (display elapsed-time))</pre>
+<p>Using this procedure, write a procedure <code>search-for-primes</code> that checks the primality of consecutive odd integers in a specified range. Use your procedure to find the three smallest primes larger than 1000; larger than 10,000; larger than 100,000; larger than 1,000,000.  Note the time needed to test each prime.  Since the testing algorithm has order of growth of <img src="book-Z-G-D-3.gif" border="0">(<img src="book-Z-G-D-13.gif" border="0"><strong>n</strong>), you should expect that testing for primes around 10,000 should take about <img src="book-Z-G-D-13.gif" border="0">10 times as long as testing for primes around 1000.  Do your timing data bear this out? How well do the data for 100,000 and 1,000,000 support the <img src="book-Z-G-D-13.gif" border="0"><strong>n</strong> prediction?  Is your result compatible with the notion that programs on your machine run in time proportional to the number of steps required for the computation?  </p>
+
+
+<u>Exercise 1.23</u><p>The <code>smallest-divisor</code> procedure shown at the start of this section does lots of needless testing: After it checks to see if the number is divisible by 2 there is no point in checking to see if it is divisible by any larger even numbers.  This suggests that the values used for <code>test-divisor</code> should not be 2, 3, 4, 5, 6, ..., but rather 2, 3, 5, 7, 9, ....  To implement this change, define a procedure <code>next</code> that returns 3 if its input is equal to 2 and otherwise returns its input plus 2.  Modify the <code>smallest-divisor</code> procedure to use <code>(next test-divisor)</code> instead of <code>(+ test-divisor 1)</code>.  With <code>timed-prime-test</code> incorporating this modified version of <code>smallest-divisor</code>, run the test for each of the 12 primes found in exercise 1.22.  Since this modification halves the number of test steps, you should expect it to run about twice as fast. Is this expectation confirmed?  If not, what is the observed ratio of the speeds of the two algorithms, and how do you explain the fact that it is different from 2? </p>
+
+
+<u>Exercise 1.24</u><p>Modify the <code>timed-prime-test</code> procedure of exercise 1.22 to use <code>fast-prime?</code> (the Fermat method), and test each of the 12 primes you found in that exercise.  Since the Fermat test has <img src="book-Z-G-D-3.gif" border="0">(<code>log</code> <strong>n</strong>) growth, how would you expect the time to test primes near 1,000,000 to compare with the time needed to test primes near 1000?  Do your data bear this out?  Can you explain any discrepancy you find?  </p>
+
+
+<u>Exercise 1.25</u><p>Alyssa P. Hacker complains that we went to a lot of extra work in writing <code>expmod</code>.  After all, she says, since we already know how to compute exponentials, we could have simply written</p>
+<pre class="code-invalid">(define (expmod base exp m)
+  (remainder (fast-expt base exp) m))</pre>
+<p>Is she correct?  Would this procedure serve as well for our fast prime tester?  Explain.  </p>
+
+
+<u>Exercise 1.26</u><p>Louis Reasoner is having great difficulty doing exercise 1.24.  His <code>fast-prime?</code> test seems to run more slowly than his <code>prime?</code> test.  Louis calls his friend Eva Lu Ator over to help.  When they examine Louis's code, they find that he has rewritten the <code>expmod</code> procedure to use an explicit multiplication, rather than calling <code>square</code>:</p>
+<pre class="code-invalid">(define (expmod base exp m)
+  (cond ((= exp 0) 1)
+        ((even? exp)
+         (remainder (* (expmod base (/ exp 2) m)
+                       (expmod base (/ exp 2) m))
+                    m))
+        (else
+         (remainder (* base (expmod base (- exp 1) m))
+                    m))))</pre>
+<p>"I don't see what difference that could make," says Louis.  "I do."  says Eva.  "By writing the procedure like that, you have transformed the <img src="book-Z-G-D-3.gif" border="0">(<code>log</code> <strong>n</strong>) process into a <img src="book-Z-G-D-3.gif" border="0">(<strong>n</strong>) process." Explain. </p>
+
+
+<u>Exercise 1.27</u><p>Demonstrate that the Carmichael numbers listed in footnote 47 really do fool the Fermat test.  That is, write a procedure that takes an integer <strong>n</strong> and tests whether <strong>a</strong><sup><strong>n</strong></sup> is congruent to <strong>a</strong> modulo <strong>n</strong> for every <strong>a</strong>&lt;<strong>n</strong>, and try your procedure on the given Carmichael numbers. </p>
+
+
+<u>Exercise 1.28</u><p>One variant of the Fermat test that cannot be fooled is called the <strong>Miller-Rabin test</strong> (Miller 1976; Rabin 1980).  This starts from an alternate form of Fermat's Little Theorem, which states that if <strong>n</strong> is a prime number and <strong>a</strong> is any positive integer less than <strong>n</strong>, then <strong>a</strong> raised to the (<strong>n</strong> - 1)st power is congruent to 1 modulo <strong>n</strong>.  To test the primality of a number <strong>n</strong> by the Miller-Rabin test, we pick a random number <strong>a</strong>&lt;<strong>n</strong> and raise <strong>a</strong> to the (<strong>n</strong> - 1)st power modulo <strong>n</strong> using the <code>expmod</code> procedure.  However, whenever we perform the squaring step in <code>expmod</code>, we check to see if we have discovered a "nontrivial square root of 1 modulo <strong>n</strong>," that is, a number not equal to 1 or <strong>n</strong> - 1 whose square is equal to 1 modulo <strong>n</strong>.  It is possible to prove that if such a nontrivial square root of 1 exists, then <strong>n</strong> is not prime.  It is also possible to prove that if <strong>n</strong> is an odd number that is not prime, then, for at least half the numbers <strong>a</strong>&lt;<strong>n</strong>, computing <strong>a</strong><sup><strong>n</strong>-1</sup> in this way will reveal a nontrivial square root of 1 modulo <strong>n</strong>.  (This is why the Miller-Rabin test cannot be fooled.)  Modify the <code>expmod</code> procedure to signal if it discovers a nontrivial square root of 1, and use this to implement the Miller-Rabin test with a procedure analogous to <code>fermat-test</code>. Check your procedure by testing various known primes and non-primes. Hint: One convenient way to make <code>expmod</code> signal is to have it return 0.  </p>
+
+
+<hr><small><p><sup><a name="footnote_43"></a>43</sup>If <strong>d</strong> is a divisor of <strong>n</strong>, then so is <strong>n</strong>/<strong>d</strong>. But <strong>d</strong> and <strong>n</strong>/<strong>d</strong> cannot both be greater than <img src="book-Z-G-D-13.gif" border="0"><strong>n</strong>.   </p>
+</small><small><p><sup><a name="footnote_44"></a>44</sup>Pierre de Fermat (1601-1665) is considered to be the founder of modern number theory.  He obtained many important number-theoretic results, but he usually announced just the results, without providing his proofs.  Fermat's Little Theorem was stated in a letter he wrote in 1640.  The first published proof was given by Euler in 1736 (and an earlier, identical proof was discovered in the unpublished manuscripts of Leibniz).  The most famous of Fermat's results -- known as Fermat's Last Theorem -- was jotted down in 1637 in his copy of the book <strong>Arithmetic</strong> (by the third-century Greek mathematician Diophantus) with the remark "I have discovered a truly remarkable proof, but this margin is too small to contain it."  Finding a proof of Fermat's Last Theorem became one of the most famous challenges in number theory.  A complete solution was finally given in 1995 by Andrew Wiles of Princeton University.   </p>
+</small><small><p><sup><a name="footnote_45"></a>45</sup>The reduction steps in the cases where the exponent <strong>e</strong> is greater than 1 are based on the fact that, for any integers <strong>x</strong>, <strong>y</strong>, and <strong>m</strong>, we can find the remainder of <strong>x</strong> times <strong>y</strong> modulo <strong>m</strong> by computing separately the remainders of <strong>x</strong> modulo <strong>m</strong> and <strong>y</strong> modulo <strong>m</strong>, multiplying these, and then taking the remainder of the result modulo <strong>m</strong>.  For instance, in the case where <strong>e</strong> is even, we compute the remainder of <strong>b</strong><sup><strong>e</strong>/2</sup> modulo <strong>m</strong>, square this, and take the remainder modulo <strong>m</strong>.  This technique is useful because it means we can perform our computation without ever having to deal with numbers much larger than <strong>m</strong>.  (Compare exercise 1.25.)   </p>
+</small><small><p><sup><a name="footnote_46"></a>46</sup>Numbers that fool the Fermat test are called <strong>Carmichael numbers</strong>, and little is known about them other than that they are extremely rare.  There are 255 Carmichael numbers below 100,000,000.  The smallest few are 561, 1105, 1729, 2465, 2821, and 6601.  In testing primality of very large numbers chosen at random, the chance of stumbling upon a value that fools the Fermat test is less than the chance that cosmic radiation will cause the computer to make an error in carrying out a "correct" algorithm.  Considering an algorithm to be inadequate for the first reason but not for the second illustrates the difference between mathematics and engineering.   </p>
+</small><small><p><sup><a name="footnote_47"></a>47</sup>One of the most striking applications of probabilistic prime testing has been to the field of cryptography. Although it is now computationally infeasible to factor an arbitrary 200-digit number, the primality of such a number can be checked in a few seconds with the Fermat test.  This fact forms the basis of a technique for constructing "unbreakable codes" suggested by Rivest, Shamir, and Adleman (1977).  The resulting <strong>RSA algorithm</strong> has become a widely used technique for enhancing the security of electronic communications.  Because of this and related developments, the study of prime numbers, once considered the epitome of a topic in "pure" mathematics to be studied only for its own sake, now turns out to have important practical applications to cryptography, electronic funds transfer, and information retrieval.   </p>
+</small><nav><ul class="pager"><li><a href="1-2-5-greatestcommon.html"><span>&laquo; Previous</span></a></li><li><a href="toc.html">Contents</a></li><li><a href="from-the-book.html"><span>Next &raquo;</span></a></li></ul></nav><button id="tryItButton" class="hidden btn btn-info btn-xs pull-right">Try it</button></div><div id="editorModal" class="modal fade" tabindex="-1" role="dialog"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button><h4 class="modal-title">Scheme Interpreter</h4></div><div class="modal-body"><label for="editorInput">Input</label><textarea id="editorInput" class="form-control"></textarea></div><div class="modal-body"><label for="editorOutput">Output</label><textarea id="editorOutput" class="form-control"></textarea></div><div class="modal-footer"><button id="editorExecute" type="button" class="btn btn-primary">Evaluate</button><button id="editorDismiss" type="button" class="btn btn-default" data-dismiss="modal">Close</button></div></div></div></div></body></html>

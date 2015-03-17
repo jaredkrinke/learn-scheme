@@ -1,0 +1,90 @@
+<!DOCTYPE html
+  PUBLIC "html">
+<meta xmlns:doc="http://jaredkrinke.github.io/doc" name="viewport" content="width=device-width, initial-scale=1"><html xmlns:doc="http://jaredkrinke.github.io/doc" lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>(learn 'scheme) - Linear Recursion and Iteration</title><script src="http://code.jquery.com/jquery-2.1.1.min.js"></script><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css"><script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css"><link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/codemirror/4.8.0/codemirror.min.css"><script src="http://cdnjs.cloudflare.com/ajax/libs/codemirror/4.8.0/codemirror.js"></script><script src="http://cdnjs.cloudflare.com/ajax/libs/codemirror/4.8.0/mode/scheme/scheme.min.js"></script><script src="jsLisp.js"></script><script src="editor.js"></script><link rel="stylesheet" href="editor.css"></head><body><div class="container"><nav class="navbar navbar-default"><div class="navbar-header"><button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#top-bar"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button><a class="navbar-brand" href="index.html">(learn 'scheme)</a></div><div class="collapse navbar-collapse" id="top-bar"><ul class="nav navbar-nav"><li><a href="1-2-proceduresandthe.html">&laquo; Previous</a></li><li class=""><a href="toc.html">Contents</a></li><li><a href="1-2-2-treerecursion.html">Next &raquo;</a></li></ul><form class="navbar-form navbar-right"><button id="launchEditor" type="button" class="btn btn-default">Launch Editor</button></form></div></nav><h1>Linear Recursion and Iteration</h1>
+
+<div class=".pull-left"><p><img src="ch1-Z-G-7.gif"><br><small><u>Figure 1.3</u>:
+                A linear recursive process for computing 6!.</small></p></div>
+<p>We begin by considering the factorial function, defined by</p>
+
+<div class=".pull-left"><img src="ch1-Z-G-8.gif"></div>
+<p>There are many ways to compute factorials.  One way is to make use of the observation that <strong>n</strong>! is equal to <strong>n</strong> times (<strong>n</strong> - 1)! for any positive integer <strong>n</strong>:</p>
+
+<div class=".pull-left"><img src="ch1-Z-G-9.gif"></div>
+<p>Thus, we can compute <strong>n</strong>! by computing (<strong>n</strong> - 1)! and multiplying the result by <strong>n</strong>.  If we add the stipulation that 1! is equal to 1, this observation translates directly into a procedure:</p>
+<pre>(define (factorial n)
+  (if (= n 1)
+      1
+      (* n (factorial (- n 1)))))</pre>
+<p>We can use the substitution model of section 1.1.5 to watch this procedure in action computing 6!, as shown in figure 1.3.</p>
+<p>Now let's take a different perspective on computing factorials.  We could describe a rule for computing <strong>n</strong>! by specifying that we first multiply 1 by 2, then multiply the result by 3, then by 4, and so on until we reach <strong>n</strong>. More formally, we maintain a running product, together with a counter that counts from 1 up to <strong>n</strong>.  We can describe the computation by saying that the counter and the product simultaneously change from one step to the next according to the rule</p>
+<p>product  <img src="book-Z-G-D-14.gif" border="0">  counter  ·  product </p>
+<p>counter  <img src="book-Z-G-D-14.gif" border="0">  counter  +  1</p>
+<p>and stipulating that <strong>n</strong>! is the value of the product when the counter exceeds <strong>n</strong>.</p>
+
+<div class=".pull-left"><p><img src="ch1-Z-G-10.gif"><br><small><u>Figure 1.4</u>:
+                A linear iterative process for computing 6!.</small></p></div>
+<p>Once again, we can recast our description as a procedure for computing factorials:<sup><a href="#footnote_28">28</a></sup></p>
+<pre>(define (factorial n)
+  (fact-iter 1 1 n))
+
+(define (fact-iter product counter max-count)
+  (if (&gt; counter max-count)
+      product
+      (fact-iter (* counter product)
+                 (+ counter 1)
+                 max-count)))</pre>
+<p>As before, we can use the substitution model to visualize the process of computing 6!, as shown in figure 1.4.</p>
+<p>Compare the two processes.  From one point of view, they seem hardly different at all.  Both compute the same mathematical function on the same domain, and each requires a number of steps proportional to <strong>n</strong> to compute <strong>n</strong>!.  Indeed, both processes even carry out the same sequence of multiplications, obtaining the same sequence of partial products.  On the other hand, when we consider the "shapes" of the two processes, we find that they evolve quite differently.</p>
+<p>Consider the first process.  The substitution model reveals a shape of expansion followed by contraction, indicated by the arrow in figure 1.3.  The expansion occurs as the process builds up a chain of <strong>deferred operations</strong> (in this case, a chain of multiplications).  The contraction occurs as  the operations are actually performed.  This type of process, characterized by a chain of deferred operations, is called a <strong>recursive process</strong>.  Carrying out this process requires that the interpreter keep track of the operations to be performed later on.  In the computation of <strong>n</strong>!, the length of the chain of deferred multiplications, and hence the amount of information needed to keep track of it, grows linearly with <strong>n</strong> (is proportional to <strong>n</strong>), just like the number of steps. Such a process is called a <strong>linear recursive process</strong>.</p>
+<p>By contrast, the second process does not grow and shrink.  At each step, all we need to keep track of, for any <strong>n</strong>, are the current values of the variables <code>product</code>, <code>counter</code>, and <code>max-count</code>.  We call this an <strong>iterative process</strong>.  In general, an iterative process is one whose state can be summarized by a fixed number of <strong>state variables</strong>, together with a fixed rule that describes how the state variables should be updated as the process moves from state to state and an (optional) end test that specifies conditions under which the process should terminate.  In computing <strong>n</strong>!, the number of steps required grows linearly with <strong>n</strong>.  Such a process is called a <strong>linear iterative process</strong>.</p>
+<p>The contrast between the two processes can be seen in another way.  In the iterative case, the program variables provide a complete description of the state of the process at any point.  If we stopped the computation between steps, all we would need to do to resume the computation is to supply the interpreter with the values of the three program variables.  Not so with the recursive process.  In this case there is some additional "hidden" information, maintained by the interpreter and not contained in the program variables, which indicates "where the process is" in negotiating the chain of deferred operations.  The longer the chain, the more information must be maintained.<sup><a href="#footnote_29">29</a></sup></p>
+<p>In contrasting iteration and recursion, we must be careful not to confuse the notion of a recursive <strong>process</strong> with the notion of a recursive <strong>procedure</strong>.  When we describe a procedure as recursive, we are referring to the syntactic fact that the procedure definition refers (either directly or indirectly) to the procedure itself.  But when we describe a process as following a pattern that is, say, linearly recursive, we are speaking about how the process evolves, not about the syntax of how a procedure is written.  It may seem disturbing that we refer to a recursive procedure such as <code>fact-iter</code> as generating an iterative process.  However, the process really is iterative: Its state is captured completely by its three state variables, and an interpreter need keep track of only three variables in order to execute the process.</p>
+<p>One reason that the distinction between process and procedure may be confusing is that most implementations of common languages (including Ada, Pascal, and C) are designed in such a way that the interpretation of any recursive procedure consumes an amount of memory that grows with the number of procedure calls, even when the process described is, in principle, iterative.  As a consequence, these languages can describe iterative processes only by resorting to special-purpose "looping constructs" such as <code>do</code>, <code>repeat</code>, <code>until</code>, <code>for</code>, and <code>while</code>.  The implementation of Scheme we shall consider in chapter 5 does not share this defect.  It will execute an iterative process in constant space, even if the iterative process is described by a recursive procedure.  An implementation with this property is called <strong>tail-recursive</strong>.  With a tail-recursive implementation, iteration can be expressed using the ordinary procedure call mechanism, so that special iteration constructs are useful only as syntactic sugar.<sup><a href="#footnote_30">30</a></sup></p>
+
+<u>Exercise 1.9</u><p>Each of the following two procedures defines a method for adding two positive integers in terms of the procedures <code>inc</code>, which increments its argument by 1, and <code>dec</code>, which decrements its argument by 1.</p>
+<pre class="code-invalid">(define (+ a b)
+  (if (= a 0)
+      b
+      (inc (+ (dec a) b))))</pre>
+<pre class="code-invalid">(define (+ a b)
+  (if (= a 0)
+      b
+      (+ (dec a) (inc b))))</pre>
+<p>Using the substitution model, illustrate the process generated by each procedure in evaluating <code>(+ 4 5)</code>.  Are these processes iterative or recursive? </p>
+
+
+<u>Exercise 1.10</u><p>The following procedure computes a mathematical function called Ackermann's function.</p>
+<pre class="code-invalid">(define (A x y)
+  (cond ((= y 0) 0)
+        ((= x 0) (* 2 y))
+        ((= y 1) 2)
+        (else (A (- x 1)
+                 (A x (- y 1))))))</pre>
+<p>What are the values of the following expressions?</p>
+<pre class="code-invalid">(A 1 10)
+
+(A 2 4)
+
+(A 3 3)</pre>
+<p>Consider the following procedures, where <code>A</code> is the procedure   defined above: </p>
+<pre class="code-invalid">(define (f n) (A 0 n))
+
+(define (g n) (A 1 n))
+
+(define (h n) (A 2 n))
+
+(define (k n) (* 5 n n))</pre>
+<p>Give concise mathematical definitions for the functions computed by the procedures <code>f</code>, <code>g</code>, and <code>h</code> for positive integer values of <strong>n</strong>.  For example, <code>(k n)</code> computes 5<strong>n</strong><sup>2</sup>. </p>
+
+<hr><small><p><sup><a name="footnote_28"></a>28</sup>In a real program we would probably use the block structure introduced in the last section to hide the definition of <code>fact-iter</code>: </p>
+<pre>(define (factorial n)
+  (define (iter product counter)
+    (if (&gt; counter n)
+        product
+        (iter (* counter product)
+              (+ counter 1))))
+  (iter 1 1))</pre>
+<p>We avoided doing this here so as to minimize the number of things to think about at once.   </p>
+</small><small><p><sup><a name="footnote_29"></a>29</sup>When we discuss the implementation of procedures on register machines in chapter 5, we will see that any iterative process can be realized "in hardware" as a machine that has a fixed set of registers and no auxiliary memory.  In contrast, realizing a recursive process requires a machine that uses an auxiliary data structure known as a <strong>stack</strong>.   </p>
+</small><small><p><sup><a name="footnote_30"></a>30</sup>Tail recursion has long been known as a compiler optimization trick.  A coherent semantic basis for tail recursion was provided by Carl Hewitt (1977), who explained it in terms of the "message-passing" model of computation that we shall discuss in chapter 3. Inspired by this, Gerald Jay Sussman and Guy Lewis Steele Jr. (see Steele 1975) constructed a tail-recursive interpreter for Scheme.  Steele later showed how tail recursion is a consequence of the natural way to compile procedure calls (Steele 1977).  The IEEE standard for Scheme requires that Scheme implementations be tail-recursive.   </p>
+</small><nav><ul class="pager"><li><a href="1-2-proceduresandthe.html"><span>&laquo; Previous</span></a></li><li><a href="toc.html">Contents</a></li><li><a href="1-2-2-treerecursion.html"><span>Next &raquo;</span></a></li></ul></nav><button id="tryItButton" class="hidden btn btn-info btn-xs pull-right">Try it</button></div><div id="editorModal" class="modal fade" tabindex="-1" role="dialog"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button><h4 class="modal-title">Scheme Interpreter</h4></div><div class="modal-body"><label for="editorInput">Input</label><textarea id="editorInput" class="form-control"></textarea></div><div class="modal-body"><label for="editorOutput">Output</label><textarea id="editorOutput" class="form-control"></textarea></div><div class="modal-footer"><button id="editorExecute" type="button" class="btn btn-primary">Evaluate</button><button id="editorDismiss" type="button" class="btn btn-default" data-dismiss="modal">Close</button></div></div></div></div></body></html>
