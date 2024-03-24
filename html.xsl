@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<xsl:stylesheet version="2.0" xmlns:xsl="https://www.w3.org/1999/XSL/Transform" xmlns:doc="https://jaredkrinke.github.io/doc">
+<xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:doc="https://jaredkrinke.github.io/doc">
     <xsl:variable name="cover-file" select="'index.html'"/>
     <xsl:variable name="toc-file" select="'toc.html'"/>
     <xsl:template name="page-custom">
