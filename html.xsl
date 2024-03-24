@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:doc="http://jaredkrinke.github.io/doc">
+<xsl:stylesheet version="2.0" xmlns:xsl="https://www.w3.org/1999/XSL/Transform" xmlns:doc="https://jaredkrinke.github.io/doc">
     <xsl:variable name="cover-file" select="'index.html'"/>
     <xsl:variable name="toc-file" select="'toc.html'"/>
     <xsl:template name="page-custom">
@@ -14,15 +14,15 @@
 <html lang="en">
 <head>
 <title><xsl:value-of select="concat($brand, ' - ', $title)"/></title>
-<script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
 
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css" />
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" />
 
-<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/codemirror/4.8.0/codemirror.min.css" />
-<script src="http://cdnjs.cloudflare.com/ajax/libs/codemirror/4.8.0/codemirror.js"></script>
-<script src="http://cdnjs.cloudflare.com/ajax/libs/codemirror/4.8.0/mode/scheme/scheme.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/4.8.0/codemirror.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/4.8.0/codemirror.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/4.8.0/mode/scheme/scheme.min.js"></script>
 
 <script src="jsLisp.js"></script>
 <script src="editor.js"></script>
@@ -42,7 +42,7 @@
     </button>
     <a class="navbar-brand" href="{$cover-file}"><xsl:value-of select="$brand"/></a>
   </div>
-  
+
   <div class="collapse navbar-collapse" id="top-bar">
     <ul class="nav navbar-nav">
       <xsl:if test="count($previous) > 0">
@@ -298,7 +298,7 @@
     <!-- Convert line breaks to "br" elements -->
     <xsl:template match="text()" mode="break-lines" name="break-lines">
         <xsl:param name="text" select="."/>
-        
+
         <xsl:choose>
           <xsl:when test="not(contains($text, '&#xA;'))">
             <xsl:copy-of select="$text"/>
