@@ -22,7 +22,7 @@
 <subsection title="How do I use (learn 'scheme)?">
 <p><brand/> is an interactive environment for learning Scheme. At any time, you can click the <term>Launch Editor</term> button in the navigation bar at the top of the screen to launch the editor. Note that, on small screens, you may need to expand the navigation bar in order to find the <term>Launch Editor</term> button.</p>
 <p>Once you're in the editor, you can type Scheme code into the <term>Input</term> text box. When you want to execute your code, simply click the <term>Evaluate</term> button or press <term>Ctrl+Enter</term>. The output of the evaluation will be displayed in the <term>Output</term> text box.</p>
-<p>To navigate the content on <brand/>, use the Next, Contents, and Previous links at the top and bottom of each page. Note that due to a bug, <term>Launch Editor</term> currently requires you to change the URL from https to http. </p>
+<p>To navigate the content on <brand/>, use the Next, Contents, and Previous links at the top and bottom of each page.</p>
 </subsection>
 
 <subsection title="Demo">
