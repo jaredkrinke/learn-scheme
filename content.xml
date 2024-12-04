@@ -17,7 +17,7 @@
 <front>
 <section title="How to Use This Site">
 <lead><brand/> is a tiny, interactive implementation of the <term>Scheme</term> programming language that runs in your browser.</lead>
-<p><term>Scheme</term> is a minimalist variant of Lisp that can be studied in order to understand Lisp in general. Lisp is frequently touted as a "powerful" programming language because of its unique design in which code is just data that can manipulated or transformed in order to create new programs at run-time.</p>
+<p><term>Scheme</term> is a minimalist variant of Lisp that can be studied in order to understand Lisp in general. Lisp is frequently touted as a "powerful" programming language because of its unique design in which code is just data that can be manipulated or transformed in order to create new programs at run-time.</p>
 
 <subsection title="How do I use (learn 'scheme)?">
 <p><brand/> is an interactive environment for learning Scheme. At any time, you can click the <term>Launch Editor</term> button in the navigation bar at the top of the screen to launch the editor. Note that, on small screens, you may need to expand the navigation bar in order to find the <term>Launch Editor</term> button.</p>
